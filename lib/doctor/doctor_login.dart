@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../services/auth_service.dart';
-import 'patient_dashboard.dart';
+import 'modules/doctor_dashboard.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'forgot_password_screen.dart';
 
-class PatientLoginScreen extends StatefulWidget {
-  const PatientLoginScreen({super.key});
+class DoctorLoginScreen extends StatefulWidget {
+  const DoctorLoginScreen({super.key});
 
   @override
-  State<PatientLoginScreen> createState() => _PatientLoginScreenState();
+  State<DoctorLoginScreen> createState() => _DoctorLoginScreenState();
 }
 
-class _PatientLoginScreenState extends State<PatientLoginScreen> {
+class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
   bool isLogin = true;
 
   // Controllers for login/signup
@@ -24,6 +24,10 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
   final TextEditingController _signupPasswordController =
       TextEditingController();
   final TextEditingController _signupPhoneController = TextEditingController();
+  final TextEditingController _signupLicenseController =
+      TextEditingController();
+  final TextEditingController _signupSpecializationController =
+      TextEditingController();
 
   @override
   void dispose() {
@@ -33,19 +37,21 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
     _signupEmailController.dispose();
     _signupPasswordController.dispose();
     _signupPhoneController.dispose();
+    _signupLicenseController.dispose();
+    _signupSpecializationController.dispose();
     super.dispose();
   }
 
   Future<void> _signInWithGoogle() async {
     try {
       await GoogleSignIn().signOut();
-      final user = await AuthService().signInWithGoogle('patient');
+      final user = await AuthService().signInWithGoogle('doctor');
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Signed in with Google!')),
         );
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const DashboardScreen()),
+          MaterialPageRoute(builder: (_) => const DoctorDashboard()),
         );
       }
     } catch (e) {
@@ -60,14 +66,14 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
       final user = await AuthService().signIn(
         _loginEmailController.text.trim(),
         _loginPasswordController.text.trim(),
-        'patient',
+        'doctor',
       );
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login successful!')),
         );
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const DashboardScreen()),
+          MaterialPageRoute(builder: (_) => const DoctorDashboard()),
         );
       }
     } catch (e) {
@@ -83,22 +89,15 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
         _signupEmailController.text.trim(),
         _signupPasswordController.text.trim(),
         _signupPhoneController.text.trim(),
-        'patient',
+        'doctor',
       );
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Signup successful! Please login to continue.')),
+          const SnackBar(content: Text('Signup successful!')),
         );
-        // Clear all signup fields
-        _signupNameController.clear();
-        _signupEmailController.clear();
-        _signupPasswordController.clear();
-        _signupPhoneController.clear();
-        // Switch to login screen
-        setState(() {
-          isLogin = true;
-        });
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const DoctorDashboard()),
+        );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -180,12 +179,12 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.local_hospital,
+                  child: const Icon(Icons.medical_services,
                       size: 54, color: Color(0xFF0288D1)),
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  isLogin ? 'Welcome Back' : 'Create Account',
+                  isLogin ? 'Welcome Back, Doctor' : 'Create Doctor Account',
                   style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -297,6 +296,9 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
                           emailController: _signupEmailController,
                           passwordController: _signupPasswordController,
                           phoneController: _signupPhoneController,
+                          licenseController: _signupLicenseController,
+                          specializationController:
+                              _signupSpecializationController,
                           onSignup: _signup,
                         ),
                 ),
@@ -418,6 +420,8 @@ class _SignupForm extends StatelessWidget {
   final TextEditingController emailController;
   final TextEditingController passwordController;
   final TextEditingController phoneController;
+  final TextEditingController licenseController;
+  final TextEditingController specializationController;
   final VoidCallback onSignup;
   const _SignupForm(
       {super.key,
@@ -425,6 +429,8 @@ class _SignupForm extends StatelessWidget {
       required this.emailController,
       required this.passwordController,
       required this.phoneController,
+      required this.licenseController,
+      required this.specializationController,
       required this.onSignup});
 
   @override
@@ -466,6 +472,29 @@ class _SignupForm extends StatelessWidget {
             fillColor: Colors.white,
           ),
           keyboardType: TextInputType.phone,
+        ),
+        const SizedBox(height: 18),
+        TextField(
+          controller: licenseController,
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.badge, color: Color(0xFF0288D1)),
+            labelText: 'Medical License Number',
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+            filled: true,
+            fillColor: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 18),
+        TextField(
+          controller: specializationController,
+          decoration: InputDecoration(
+            prefixIcon:
+                const Icon(Icons.medical_services, color: Color(0xFF0288D1)),
+            labelText: 'Specialization',
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+            filled: true,
+            fillColor: Colors.white,
+          ),
         ),
         const SizedBox(height: 18),
         TextField(

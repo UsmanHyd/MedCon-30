@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'patient/patient_login.dart';
+import 'doctor/doctor_login.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
@@ -70,9 +71,9 @@ class RoleSelectionScreen extends StatelessWidget {
                       Icons.medical_information,
                       Colors.teal,
                       () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text("Doctor login coming soon")),
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (_) => const DoctorLoginScreen()),
                         );
                       },
                     ),
@@ -85,7 +86,7 @@ class RoleSelectionScreen extends StatelessWidget {
                       () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                              builder: (_) => const LoginScreen()),
+                              builder: (_) => const PatientLoginScreen()),
                         );
                       },
                     ),

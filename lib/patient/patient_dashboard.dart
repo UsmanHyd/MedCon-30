@@ -5,11 +5,14 @@ import 'package:medcon30/patient/modules/disease/disease_detection.dart';
 import 'package:medcon30/patient/modules/heart/heart_disease.dart';
 import 'package:medcon30/patient/modules/nutrition/nutrition_fitness.dart';
 import 'package:medcon30/patient/profile_display.dart';
+import 'package:medcon30/patient/profile_creation.dart';
 import 'package:provider/provider.dart';
 import 'package:medcon30/theme/theme_provider.dart';
 import 'modules/stress/stress_monitoring.dart';
 import 'package:medcon30/patient/modules/vaccine/vaccination_reminders.dart';
 import 'package:medcon30/patient/modules/SOS/sos_messaging.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -21,6 +24,51 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _currentIndex = 1;
   bool _showChatbot = false;
+  bool _isLoading = true;
+  bool _hasProfile = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkUserProfile();
+  }
+
+  Future<void> _checkUserProfile() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        setState(() {
+          _isLoading = false;
+          _hasProfile = false;
+        });
+        return;
+      }
+
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      setState(() {
+        _isLoading = false;
+        _hasProfile = doc.exists && doc.data()?['fullName'] != null;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _hasProfile = false;
+      });
+    }
+  }
+
+  Widget _getScreenForIndex(int index) {
+    if (index == 2) {
+      return _hasProfile
+          ? const ProfileDisplayScreen()
+          : const ProfileCreationScreen();
+    }
+    return _screens[index];
+  }
 
   final List<Widget> _screens = const [
     CommunityGroupsScreen(),
@@ -39,6 +87,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     return Scaffold(
       extendBody: true,
@@ -87,7 +143,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
-            child: _screens[_currentIndex],
+            child: _getScreenForIndex(_currentIndex),
           ),
           if (_showChatbot)
             Positioned(
