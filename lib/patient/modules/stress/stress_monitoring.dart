@@ -32,7 +32,6 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
               iconColor: const Color(0xFF7B61FF),
               title: 'Take Stress Survey',
               description: 'Assess your current stress levels',
-              actionText: 'Start assessment',
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -47,7 +46,6 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
               iconColor: const Color(0xFF7B9EFF),
               title: 'Relief Strategies',
               description: 'Discover techniques to reduce stress',
-              actionText: 'View techniques',
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -70,8 +68,6 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
               iconColor: const Color(0xFF4ADE80),
               title: 'Track Progress',
               description: 'Monitor your improvement over time',
-              actionText: 'See insights',
-              actionColor: const Color(0xFF22C55E),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -166,67 +162,51 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
     required Color iconColor,
     required String title,
     required String description,
-    required String actionText,
-    Color actionColor = const Color(0xFF7B61FF),
     required VoidCallback onTap,
   }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.all(10),
-                child: Icon(icon, color: iconColor, size: 28),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
-                    const SizedBox(height: 2),
-                    Text(description,
-                        style: const TextStyle(
-                            fontSize: 13, color: Colors.black54)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          GestureDetector(
-            onTap: onTap,
-            child: Text(
-              actionText,
-              style: TextStyle(
-                color: actionColor,
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
+              padding: const EdgeInsets.all(10),
+              child: Icon(icon, color: iconColor, size: 28),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(height: 2),
+                  Text(description,
+                      style:
+                          const TextStyle(fontSize: 13, color: Colors.black54)),
+                ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

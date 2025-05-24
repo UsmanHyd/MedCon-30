@@ -32,7 +32,7 @@ class HeartDiseaseDetectionScreen extends StatelessWidget {
               const SizedBox(height: 18),
               _mainCard(
                 icon: Icons.file_upload_outlined,
-                iconColor: Color(0xFF7B61FF),
+                iconColor: const Color(0xFF7B61FF),
                 title: 'Upload Report/ECG',
                 description:
                     'Upload your medical reports or ECG recordings for AI analysis.',
@@ -48,7 +48,7 @@ class HeartDiseaseDetectionScreen extends StatelessWidget {
               const SizedBox(height: 18),
               _mainCard(
                 icon: Icons.favorite_border,
-                iconColor: Color(0xFF0288D1),
+                iconColor: const Color(0xFF0288D1),
                 title: 'View Results',
                 description:
                     'Check your heart health analysis and recommendations.',
@@ -207,7 +207,7 @@ class _UploadMedicalReportScreenState extends State<UploadMedicalReportScreen> {
       } catch (e2) {
         print('Alternative approach also failed: $e2');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
               content: Text(
                   'Unable to open file picker. Please try restarting the app.')),
         );
@@ -251,8 +251,8 @@ class _UploadMedicalReportScreenState extends State<UploadMedicalReportScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE3E8F0),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFE3E8F0),
                       shape: BoxShape.circle,
                     ),
                     padding: const EdgeInsets.all(16),
@@ -419,8 +419,8 @@ class _AnalysisCompleteScreenState extends State<AnalysisCompleteScreen>
                   child: Column(
                     children: [
                       Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFD1FADF),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFD1FADF),
                           shape: BoxShape.circle,
                         ),
                         padding: const EdgeInsets.all(18),

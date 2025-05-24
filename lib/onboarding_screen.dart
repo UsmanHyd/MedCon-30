@@ -19,28 +19,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       description:
           'Your personal healthcare companion for better health management',
       icon: Icons.health_and_safety,
-      color: Color(0xFF0288D1),
+      color: const Color(0xFF0288D1),
     ),
     OnboardingPage(
       title: 'Track Your Health',
       description:
           'Monitor vital signs, track medications, and manage appointments all in one place',
       icon: Icons.monitor_heart,
-      color: Color(0xFF4CAF50),
+      color: const Color(0xFF4CAF50),
     ),
     OnboardingPage(
       title: 'Connect with Doctors',
       description:
           'Schedule virtual consultations and get medical advice from healthcare professionals',
       icon: Icons.people,
-      color: Color(0xFF9C27B0),
+      color: const Color(0xFF9C27B0),
     ),
     OnboardingPage(
       title: 'Emergency Support',
       description:
           'Quick access to emergency services and SOS features when you need them most',
       icon: Icons.emergency,
-      color: Color(0xFFF44336),
+      color: const Color(0xFFF44336),
     ),
   ];
 
@@ -192,44 +192,46 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildPage(OnboardingPage page) {
-    return Padding(
-      padding: const EdgeInsets.all(40.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: page.color.withOpacity(0.1),
-              shape: BoxShape.circle,
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: page.color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                page.icon,
+                size: 80,
+                color: page.color,
+              ),
             ),
-            child: Icon(
-              page.icon,
-              size: 80,
-              color: page.color,
+            const SizedBox(height: 24),
+            Text(
+              page.title,
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF01579B),
+              ),
+              textAlign: TextAlign.center,
             ),
-          ),
-          const SizedBox(height: 40),
-          Text(
-            page.title,
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF01579B),
+            const SizedBox(height: 16),
+            Text(
+              page.description,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[700],
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 20),
-          Text(
-            page.description,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[700],
-              height: 1.5,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

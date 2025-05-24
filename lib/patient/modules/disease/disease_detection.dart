@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:medcon30/patient/patient_dashboard.dart';
+import 'package:medcon30/patient/profile/patient_dashboard.dart';
 import 'diagnosis.dart';
 
 class DiseaseDetectionScreen extends StatefulWidget {
+  const DiseaseDetectionScreen({super.key});
+
   @override
   _DiseaseDetectionScreenState createState() => _DiseaseDetectionScreenState();
 }
@@ -63,9 +65,9 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF4F9FD),
+      backgroundColor: const Color(0xFFE0F7FA),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFE0F7FA),
         elevation: 1,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new, color: Colors.blueGrey[900]),
@@ -86,9 +88,9 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
           ),
         ),
         centerTitle: true,
-        actions: [
+        actions: const [
           Padding(
-            padding: const EdgeInsets.only(right: 18.0),
+            padding: EdgeInsets.only(right: 18.0),
             child: Icon(Icons.help_outline, color: Color(0xFF2196F3), size: 20),
           ),
         ],
@@ -103,8 +105,9 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                    color: const Color(0xFFE0F7FA),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 18),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -116,7 +119,7 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                             color: Colors.blueGrey[900],
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
                           'Enter your symptoms to get potential diagnoses',
                           style: TextStyle(
@@ -125,29 +128,31 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        SizedBox(height: 18),
+                        const SizedBox(height: 18),
                         TextField(
                           controller: searchController,
                           decoration: InputDecoration(
-                            prefixIcon:
-                                Icon(Icons.search, color: Color(0xFF2196F3)),
+                            prefixIcon: const Icon(Icons.search,
+                                color: Color(0xFF2196F3)),
                             hintText: 'Type your symptoms...',
                             hintStyle: TextStyle(color: Colors.blueGrey[300]),
                             filled: true,
                             fillColor: Colors.white,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Color(0xFFE0E3EA)),
+                              borderSide:
+                                  const BorderSide(color: Color(0xFFE0E3EA)),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Color(0xFFE0E3EA)),
+                              borderSide:
+                                  const BorderSide(color: Color(0xFFE0E3EA)),
                             ),
-                            contentPadding: EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                                 vertical: 0, horizontal: 8),
                           ),
                         ),
-                        SizedBox(height: 18),
+                        const SizedBox(height: 18),
                         Wrap(
                           spacing: 10,
                           runSpacing: 10,
@@ -157,18 +162,18 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                             return GestureDetector(
                               onTap: () => _toggleSymptom(symptom),
                               child: AnimatedContainer(
-                                duration: Duration(milliseconds: 150),
-                                padding: EdgeInsets.symmetric(
+                                duration: const Duration(milliseconds: 150),
+                                padding: const EdgeInsets.symmetric(
                                     horizontal: 18, vertical: 8),
                                 decoration: BoxDecoration(
                                   color: isSelected
-                                      ? Color(0xFF2196F3)
-                                      : Color(0xFFF4F4F4),
+                                      ? const Color(0xFF2196F3)
+                                      : const Color(0xFFF4F4F4),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                     color: isSelected
-                                        ? Color(0xFF2196F3)
-                                        : Color(0xFFE0E3EA),
+                                        ? const Color(0xFF2196F3)
+                                        : const Color(0xFFE0E3EA),
                                     width: 1.5,
                                   ),
                                 ),
@@ -187,7 +192,7 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                           }).toList(),
                         ),
                         if (selectedSymptoms.isNotEmpty) ...[
-                          SizedBox(height: 22),
+                          const SizedBox(height: 22),
                           Text(
                             'Selected Symptoms:',
                             style: TextStyle(
@@ -196,18 +201,18 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                               color: Colors.blueGrey[900],
                             ),
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           Wrap(
                             spacing: 10,
                             runSpacing: 10,
                             children: selectedSymptoms
                                 .map((symptom) => Chip(
                                       label: Text(symptom),
-                                      deleteIcon: Icon(Icons.close,
+                                      deleteIcon: const Icon(Icons.close,
                                           size: 18, color: Color(0xFF2196F3)),
                                       onDeleted: () => _removeSymptom(symptom),
-                                      backgroundColor: Color(0xFFE3F2FD),
-                                      labelStyle: TextStyle(
+                                      backgroundColor: const Color(0xFFE3F2FD),
+                                      labelStyle: const TextStyle(
                                           color: Color(0xFF2196F3),
                                           fontWeight: FontWeight.w600),
                                       shape: RoundedRectangleBorder(
@@ -217,7 +222,7 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                                 .toList(),
                           ),
                         ],
-                        SizedBox(height: 30),
+                        const SizedBox(height: 30),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
@@ -233,15 +238,15 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                                 : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: selectedSymptoms.isNotEmpty
-                                  ? Color(0xFF2196F3)
-                                  : Color(0xFFB0BEC5),
-                              minimumSize: Size(double.infinity, 48),
+                                  ? const Color(0xFF2196F3)
+                                  : const Color(0xFFB0BEC5),
+                              minimumSize: const Size(double.infinity, 48),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               elevation: 0,
                             ),
-                            child: Text(
+                            child: const Text(
                               'Check for Potential Diagnoses',
                               style: TextStyle(
                                 fontSize: 17,
@@ -251,7 +256,7 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                       ],
                     ),
                   ),

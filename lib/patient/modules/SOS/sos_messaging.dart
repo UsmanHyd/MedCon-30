@@ -58,6 +58,155 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
     }
   }
 
+  Future<void> _addEmergencyContact() async {
+    if (_emergencyContacts.length >= 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Maximum of 3 emergency contacts allowed'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final result = await showDialog<Map<String, String>>(
+      context: context,
+      builder: (context) {
+        final nameController = TextEditingController();
+        final phoneController = TextEditingController();
+        final relationController = TextEditingController();
+
+        return AlertDialog(
+          title: const Text('Add Emergency Contact'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: phoneController,
+                decoration: const InputDecoration(
+                  labelText: 'Phone Number',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.phone,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: relationController,
+                decoration: const InputDecoration(
+                  labelText: 'Relation',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (nameController.text.isEmpty ||
+                    phoneController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Name and phone number are required'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                Navigator.pop(context, {
+                  'name': nameController.text,
+                  'phone': phoneController.text,
+                  'relation': relationController.text,
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0288D1),
+              ),
+              child: const Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result != null) {
+      try {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user == null) throw Exception('User not logged in');
+
+        final newContacts = [..._emergencyContacts, result];
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .update({'emergencyContacts': newContacts});
+
+        setState(() {
+          _emergencyContacts = newContacts;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Emergency contact added successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } catch (e) {
+        print('Error adding contact: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to add emergency contact'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteEmergencyContact(int index) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception('User not logged in');
+
+      final newContacts = List<Map<String, dynamic>>.from(_emergencyContacts);
+      newContacts.removeAt(index);
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({'emergencyContacts': newContacts});
+
+      setState(() {
+        _emergencyContacts = newContacts;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Emergency contact removed successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      print('Error deleting contact: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to remove emergency contact'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -236,9 +385,30 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                           style: const TextStyle(color: Colors.red)),
                     )
                   else if (_emergencyContacts.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Text('No emergency contacts found.'),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          const Text(
+                            'No emergency contacts found.',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.add),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF0288D1),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            onPressed: _addEmergencyContact,
+                            label: const Text('Add Emergency Contact',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
                     )
                   else ...[
                     for (final contact in _emergencyContacts)
@@ -266,43 +436,34 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                                         fontSize: 13, color: Colors.blue)),
                             ],
                           ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon:
-                                    const Icon(Icons.edit, color: Colors.blue),
-                                onPressed: () {}, // TODO: Implement edit
-                              ),
-                              IconButton(
-                                icon:
-                                    const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () {}, // TODO: Implement delete
-                              ),
-                            ],
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _deleteEmergencyContact(
+                                _emergencyContacts.indexOf(contact)),
                           ),
                         ),
                       ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.add),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF0288D1),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                    if (_emergencyContacts.length < 3)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.add),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF0288D1),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                             ),
+                            onPressed: _addEmergencyContact,
+                            label: const Text('Add Emergency Contact',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
-                          onPressed: () {}, // TODO: Implement add
-                          label: const Text('Add Emergency Contact',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ),
-                    ),
                   ],
                 ],
               ),
@@ -410,7 +571,7 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                     subtitle: const Text(
                         'Send your precise location to emergency contacts'),
                     value: _shareLocation,
-                    activeColor: Color(0xFF0288D1),
+                    activeColor: const Color(0xFF0288D1),
                     onChanged: (val) {
                       setState(() {
                         _shareLocation = val;
@@ -422,7 +583,7 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                     subtitle: const Text(
                         'Share recent location history (last 30 minutes)'),
                     value: _locationHistory,
-                    activeColor: Color(0xFF0288D1),
+                    activeColor: const Color(0xFF0288D1),
                     onChanged: (val) {
                       setState(() {
                         _locationHistory = val;
@@ -434,7 +595,7 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                     subtitle:
                         const Text('Send location updates every 2 minutes'),
                     value: _continuousUpdates,
-                    activeColor: Color(0xFF0288D1),
+                    activeColor: const Color(0xFF0288D1),
                     onChanged: (val) {
                       setState(() {
                         _continuousUpdates = val;

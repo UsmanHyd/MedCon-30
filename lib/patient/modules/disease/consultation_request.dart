@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'request_confirmed.dart';
 
 class ConsultationRequestScreen extends StatefulWidget {
+  const ConsultationRequestScreen({super.key});
+
   @override
   State<ConsultationRequestScreen> createState() =>
       _ConsultationRequestScreenState();
@@ -40,14 +42,14 @@ class _ConsultationRequestScreenState extends State<ConsultationRequestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF4F9FD),
+      backgroundColor: const Color(0xFFE0F7FA),
       body: SafeArea(
         child: Column(
           children: [
             // Top bar
             Container(
-              color: Colors.white,
-              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 16),
+              color: const Color(0xFFE0F7FA),
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16),
               child: Row(
                 children: [
                   IconButton(
@@ -67,23 +69,23 @@ class _ConsultationRequestScreenState extends State<ConsultationRequestScreen> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 18.0),
+                  const Padding(
+                    padding: EdgeInsets.only(right: 18.0),
                     child: Icon(Icons.help_outline,
                         color: Color(0xFF2196F3), size: 20),
                   ),
                 ],
               ),
             ),
-            Divider(height: 1, thickness: 1, color: Color(0xFFE0E3EA)),
+            const Divider(height: 1, thickness: 1, color: Color(0xFFE0E3EA)),
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
                   // Doctor card
                   Container(
-                    margin: EdgeInsets.all(16),
-                    padding: EdgeInsets.all(12),
+                    margin: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -100,11 +102,11 @@ class _ConsultationRequestScreenState extends State<ConsultationRequestScreen> {
                                 size: 48, color: Colors.blueGrey[200]),
                           ),
                         ),
-                        SizedBox(width: 14),
+                        const SizedBox(width: 14),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Dr. Sarah Johnson',
+                            const Text('Dr. Sarah Johnson',
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 16)),
                             Text('General Physician',
@@ -117,8 +119,9 @@ class _ConsultationRequestScreenState extends State<ConsultationRequestScreen> {
                   ),
                   // Symptom description
                   Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                    padding: EdgeInsets.all(14),
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14),
@@ -126,10 +129,10 @@ class _ConsultationRequestScreenState extends State<ConsultationRequestScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Describe your symptoms',
+                        const Text('Describe your symptoms',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 15)),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         TextField(
                           controller: _symptomController,
                           maxLines: 3,
@@ -138,12 +141,12 @@ class _ConsultationRequestScreenState extends State<ConsultationRequestScreen> {
                                 'Please describe your symptoms in detail...',
                             hintStyle: TextStyle(color: Colors.blueGrey[300]),
                             filled: true,
-                            fillColor: Color(0xFFF4F9FD),
+                            fillColor: const Color(0xFFF4F9FD),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: BorderSide.none,
                             ),
-                            contentPadding: EdgeInsets.all(12),
+                            contentPadding: const EdgeInsets.all(12),
                           ),
                           onChanged: (_) => setState(() {}),
                         ),
@@ -152,8 +155,9 @@ class _ConsultationRequestScreenState extends State<ConsultationRequestScreen> {
                   ),
                   // Select Date
                   Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    padding: EdgeInsets.all(14),
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14),
@@ -161,26 +165,26 @@ class _ConsultationRequestScreenState extends State<ConsultationRequestScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Select Date',
+                        const Text('Select Date',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 15)),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: List.generate(dates.length, (i) {
                               final selected = selectedDate == i;
                               return Padding(
-                                padding: EdgeInsets.only(right: 10),
+                                padding: const EdgeInsets.only(right: 10),
                                 child: GestureDetector(
                                   onTap: () => setState(() => selectedDate = i),
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(
+                                    padding: const EdgeInsets.symmetric(
                                         horizontal: 16, vertical: 10),
                                     decoration: BoxDecoration(
                                       color: selected
-                                          ? Color(0xFF2196F3)
-                                          : Color(0xFFF4F9FD),
+                                          ? const Color(0xFF2196F3)
+                                          : const Color(0xFFF4F9FD),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Column(
@@ -217,8 +221,9 @@ class _ConsultationRequestScreenState extends State<ConsultationRequestScreen> {
                   ),
                   // Select Time Slot
                   Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                    padding: EdgeInsets.all(14),
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14),
@@ -226,10 +231,10 @@ class _ConsultationRequestScreenState extends State<ConsultationRequestScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Select Time Slot',
+                        const Text('Select Time Slot',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 15)),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Wrap(
                           spacing: 10,
                           runSpacing: 10,
@@ -238,12 +243,12 @@ class _ConsultationRequestScreenState extends State<ConsultationRequestScreen> {
                             return GestureDetector(
                               onTap: () => setState(() => selectedTime = i),
                               child: Container(
-                                padding: EdgeInsets.symmetric(
+                                padding: const EdgeInsets.symmetric(
                                     horizontal: 18, vertical: 10),
                                 decoration: BoxDecoration(
                                   color: selected
-                                      ? Color(0xFF2196F3)
-                                      : Color(0xFFF4F9FD),
+                                      ? const Color(0xFF2196F3)
+                                      : const Color(0xFFF4F9FD),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
@@ -265,8 +270,9 @@ class _ConsultationRequestScreenState extends State<ConsultationRequestScreen> {
                   ),
                   // Terms checkbox
                   Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    padding: EdgeInsets.all(14),
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14),
@@ -276,9 +282,9 @@ class _ConsultationRequestScreenState extends State<ConsultationRequestScreen> {
                         Checkbox(
                           value: agreed,
                           onChanged: (v) => setState(() => agreed = v ?? false),
-                          activeColor: Color(0xFF2196F3),
+                          activeColor: const Color(0xFF2196F3),
                         ),
-                        Expanded(
+                        const Expanded(
                           child: Text(
                             'I agree to the terms and conditions for online consultation',
                             style: TextStyle(fontSize: 14),
@@ -306,15 +312,16 @@ class _ConsultationRequestScreenState extends State<ConsultationRequestScreen> {
                               }
                             : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              canSend ? Color(0xFF2196F3) : Color(0xFFB0BEC5),
-                          minimumSize: Size(double.infinity, 48),
+                          backgroundColor: canSend
+                              ? const Color(0xFF2196F3)
+                              : const Color(0xFFB0BEC5),
+                          minimumSize: const Size(double.infinity, 48),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                           elevation: 0,
                         ),
-                        child: Text(
+                        child: const Text(
                           'Send Request',
                           style: TextStyle(
                             fontSize: 16,
@@ -325,7 +332,7 @@ class _ConsultationRequestScreenState extends State<ConsultationRequestScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),

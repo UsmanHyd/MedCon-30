@@ -143,7 +143,40 @@ class FirestoreService {
   // Delete a vaccination reminder
   Future<void> deleteVaccinationReminder(String docId) async {
     try {
-      await _firestore.collection('vaccination_reminders').doc(docId).delete();
+      final userId = currentUserId;
+      if (userId == null) throw Exception('User not authenticated');
+
+      // Get the document first to verify ownership
+      final doc =
+          await _firestore.collection('vaccination_reminders').doc(docId).get();
+      if (!doc.exists) {
+        throw Exception('Vaccination reminder not found');
+      }
+
+      final docData = doc.data();
+      if (docData == null) {
+        throw Exception('Invalid document data');
+      }
+
+      print('Debug - Current user ID: $userId');
+      print('Debug - Document data: $docData');
+      print('Debug - Document userId: ${docData['userId']}');
+      print('Debug - Has userId field: ${docData.containsKey('userId')}');
+
+      // Allow deletion if:
+      // 1. The document has no userId (old document)
+      // 2. The userId matches the current user
+      if (!docData.containsKey('userId') || docData['userId'] == userId) {
+        await _firestore
+            .collection('vaccination_reminders')
+            .doc(docId)
+            .delete();
+        print('Vaccination reminder deleted successfully');
+      } else {
+        print(
+            'Debug - Permission denied. Document userId: ${docData['userId']}, Current userId: $userId');
+        throw Exception('You do not have permission to delete this reminder');
+      }
     } catch (e) {
       print('Error deleting vaccination reminder: $e');
       throw Exception('Failed to delete vaccination reminder: $e');

@@ -28,6 +28,9 @@ class MyApp extends StatelessWidget {
                   themeProvider.isDarkMode ? Brightness.dark : Brightness.light,
               scaffoldBackgroundColor:
                   themeProvider.isDarkMode ? Colors.grey[900] : Colors.white,
+              cardColor: themeProvider.isDarkMode
+                  ? const Color(0xFF222328)
+                  : Colors.white,
               appBarTheme: AppBarTheme(
                 backgroundColor:
                     themeProvider.isDarkMode ? Colors.grey[850] : Colors.white,

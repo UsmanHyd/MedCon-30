@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../patient_dashboard.dart';
+import '../../profile/patient_dashboard.dart';
 import 'package:medcon30/patient/modules/nutrition/plan.dart';
 
 class NutritionFitnessScreen extends StatelessWidget {
@@ -41,13 +41,13 @@ class NutritionFitnessScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Greeting Row
-              Row(
+              const Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text('Hi, Sarah!',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 22)),
@@ -135,9 +135,9 @@ class _ProgressCard extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   fontSize: 32)),
           const SizedBox(height: 12),
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               _ProgressStat(label: 'Calories', value: '1,200/1,800'),
               _ProgressStat(label: 'Steps', value: '8.5k/10k'),
               _ProgressStat(label: 'Water', value: '6/8 cups'),
@@ -191,10 +191,10 @@ class _ScheduleCard extends StatelessWidget {
         children: [
           const Icon(Icons.access_time, color: Color(0xFF4F8CFF)),
           const SizedBox(width: 10),
-          Expanded(
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text('Next up in 30 mins',
                     style: TextStyle(color: Colors.green, fontSize: 13)),
                 SizedBox(height: 2),
@@ -654,7 +654,7 @@ class _SetYourGoalsScreenState extends State<SetYourGoalsScreen> {
               children: [
                 const Text('Start Date',
                     style: TextStyle(color: Colors.black54)),
-                Text('${_formatDate(startDate)}',
+                Text(_formatDate(startDate),
                     style: const TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
@@ -663,7 +663,7 @@ class _SetYourGoalsScreenState extends State<SetYourGoalsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('End Date', style: TextStyle(color: Colors.black54)),
-                Text('${_formatDate(endDate)}',
+                Text(_formatDate(endDate),
                     style: const TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
@@ -822,8 +822,8 @@ class _GoalOption extends StatelessWidget {
 class _RecentActivities extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: const [
+    return const Column(
+      children: [
         _ActivityTile(
           icon: Icons.directions_run_rounded,
           color: Color(0xFF4F8CFF),

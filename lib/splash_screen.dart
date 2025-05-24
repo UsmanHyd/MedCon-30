@@ -27,28 +27,28 @@ class _SplashScreenState extends State<SplashScreen>
       description:
           'Your personal healthcare companion for better health management',
       icon: Icons.health_and_safety,
-      color: Color(0xFF0288D1),
+      color: const Color(0xFF0288D1),
     ),
     OnboardingPage(
       title: 'Track Your Health',
       description:
           'Monitor vital signs, track medications, and manage appointments all in one place',
       icon: Icons.monitor_heart,
-      color: Color(0xFF4CAF50),
+      color: const Color(0xFF4CAF50),
     ),
     OnboardingPage(
       title: 'Connect with Doctors',
       description:
           'Schedule virtual consultations and get medical advice from healthcare professionals',
       icon: Icons.people,
-      color: Color(0xFF9C27B0),
+      color: const Color(0xFF9C27B0),
     ),
     OnboardingPage(
       title: 'Emergency Support',
       description:
           'Quick access to emergency services and SOS features when you need them most',
       icon: Icons.emergency,
-      color: Color(0xFFF44336),
+      color: const Color(0xFFF44336),
     ),
   ];
 
@@ -188,9 +188,10 @@ class _SplashScreenState extends State<SplashScreen>
                                 borderRadius: BorderRadius.circular(8),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Color(0xFF0288D1).withOpacity(0.18),
+                                    color: const Color(0xFF0288D1)
+                                        .withOpacity(0.18),
                                     blurRadius: 12,
-                                    offset: Offset(0, 3),
+                                    offset: const Offset(0, 3),
                                   ),
                                 ],
                               ),
@@ -201,7 +202,7 @@ class _SplashScreenState extends State<SplashScreen>
                                     width: 180 * _progressAnimation.value,
                                     height: 12,
                                     decoration: BoxDecoration(
-                                      gradient: LinearGradient(
+                                      gradient: const LinearGradient(
                                         colors: [
                                           Color(0xFF0288D1),
                                           Color(0xFF4FC3F7),
@@ -212,10 +213,10 @@ class _SplashScreenState extends State<SplashScreen>
                                       borderRadius: BorderRadius.circular(8),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Color(0xFF0288D1)
+                                          color: const Color(0xFF0288D1)
                                               .withOpacity(0.25),
                                           blurRadius: 8,
-                                          offset: Offset(0, 2),
+                                          offset: const Offset(0, 2),
                                         ),
                                       ],
                                     ),

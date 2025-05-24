@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'disease_detection.dart';
 
 class RequestConfirmedScreen extends StatelessWidget {
+  const RequestConfirmedScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF4F9FD),
+      backgroundColor: const Color(0xFFE0F7FA),
       body: SafeArea(
         child: Column(
           children: [
             // Top bar
             Container(
-              color: Colors.white,
-              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 16),
+              color: const Color(0xFFE0F7FA),
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16),
               child: Row(
                 children: [
                   IconButton(
@@ -32,41 +34,43 @@ class RequestConfirmedScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 18.0),
+                  const Padding(
+                    padding: EdgeInsets.only(right: 18.0),
                     child: Icon(Icons.help_outline,
                         color: Color(0xFF2196F3), size: 20),
                   ),
                 ],
               ),
             ),
-            Divider(height: 1, thickness: 1, color: Color(0xFFE0E3EA)),
+            const Divider(height: 1, thickness: 1, color: Color(0xFFE0E3EA)),
             Expanded(
               child: Center(
                 child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 28),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: const Color(0xFFE0F7FA),
                     borderRadius: BorderRadius.circular(18),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.06),
                         blurRadius: 12,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      CircleAvatar(
+                      const CircleAvatar(
                         backgroundColor: Color(0xFFE3F2FD),
                         radius: 32,
                         child: Icon(Icons.check,
                             color: Color(0xFF2196F3), size: 40),
                       ),
-                      SizedBox(height: 18),
+                      const SizedBox(height: 18),
                       Text(
                         'Request Sent\nSuccessfully!',
                         textAlign: TextAlign.center,
@@ -76,7 +80,7 @@ class RequestConfirmedScreen extends StatelessWidget {
                           color: Colors.blueGrey[900],
                         ),
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Text(
                         'Your consultation request has been sent to\nDr. Sarah Johnson. You will receive a\nconfirmation shortly.',
                         textAlign: TextAlign.center,
@@ -85,12 +89,12 @@ class RequestConfirmedScreen extends StatelessWidget {
                           fontSize: 15,
                         ),
                       ),
-                      SizedBox(height: 22),
+                      const SizedBox(height: 22),
                       Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 14),
                         decoration: BoxDecoration(
-                          color: Color(0xFFF4F9FD),
+                          color: const Color(0xFFE0F7FA),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Column(
@@ -102,14 +106,14 @@ class RequestConfirmedScreen extends StatelessWidget {
                                         color: Colors.blueGrey[400],
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15)),
-                                SizedBox(width: 8),
-                                Text('Friday, May 9, 2025',
+                                const SizedBox(width: 8),
+                                const Text('Friday, May 9, 2025',
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15)),
                               ],
                             ),
-                            SizedBox(height: 6),
+                            const SizedBox(height: 6),
                             Row(
                               children: [
                                 Text('Time:',
@@ -117,8 +121,8 @@ class RequestConfirmedScreen extends StatelessWidget {
                                         color: Colors.blueGrey[400],
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15)),
-                                SizedBox(width: 8),
-                                Text('04:00 PM',
+                                const SizedBox(width: 8),
+                                const Text('04:00 PM',
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15)),
@@ -147,14 +151,14 @@ class RequestConfirmedScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF2196F3),
-                    minimumSize: Size(double.infinity, 48),
+                    backgroundColor: const Color(0xFF2196F3),
+                    minimumSize: const Size(double.infinity, 48),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                     elevation: 0,
                   ),
-                  child: Text(
+                  child: const Text(
                     'Back to Home',
                     style: TextStyle(
                       fontSize: 16,
@@ -165,7 +169,7 @@ class RequestConfirmedScreen extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
           ],
         ),
       ),

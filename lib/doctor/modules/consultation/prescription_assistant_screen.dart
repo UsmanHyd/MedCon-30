@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '/doctor/modules/doctor_dashboard.dart';
+import 'package:provider/provider.dart';
+import 'package:medcon30/theme/theme_provider.dart';
 
 class PrescriptionAssistantScreen extends StatefulWidget {
   const PrescriptionAssistantScreen({Key? key}) : super(key: key);
@@ -28,6 +30,7 @@ class _PrescriptionAssistantScreenState
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     final recommendedMeds = [
       {
         'name': 'Sumatriptan',
@@ -68,37 +71,41 @@ class _PrescriptionAssistantScreenState
     return Scaffold(
       appBar: AppBar(
         title: const Text('Prescription Assistant'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: isDarkMode ? Colors.grey[850] : Colors.white,
+        foregroundColor: const Color(0xFF0288D1),
         elevation: 0.5,
         centerTitle: true,
+        surfaceTintColor: isDarkMode ? Colors.grey[850] : Colors.white,
+        scrolledUnderElevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert, color: Color(0xFF0288D1)),
             onPressed: () {},
           ),
         ],
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? Colors.grey[900] : const Color(0xFFE6F3FF),
       body: Column(
         children: [
           // Patient header
           Container(
             width: double.infinity,
-            color: Colors.white,
+            color: isDarkMode ? Colors.grey[850] : Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: Colors.pink.shade100,
-                  child:
-                      const Text('HR', style: TextStyle(color: Colors.black)),
+                  backgroundColor: isDarkMode ? Colors.grey[850] : Colors.white,
+                  child: const Text('HR',
+                      style: TextStyle(
+                          color: Color(0xFF0288D1),
+                          fontWeight: FontWeight.bold)),
                 ),
                 const SizedBox(width: 12),
-                Expanded(
+                const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text('Harper Reynolds',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 15)),
@@ -118,7 +125,7 @@ class _PrescriptionAssistantScreenState
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6750A4),
+                    backgroundColor: const Color(0xFF0288D1),
                     foregroundColor: Colors.white,
                     padding:
                         const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
@@ -133,12 +140,12 @@ class _PrescriptionAssistantScreenState
           ),
           // Tabs
           Container(
-            color: Colors.white,
+            color: isDarkMode ? Colors.grey[850] : Colors.white,
             child: TabBar(
               controller: _tabController,
-              labelColor: const Color(0xFF6750A4),
+              labelColor: const Color(0xFF0288D1),
               unselectedLabelColor: Colors.grey,
-              indicatorColor: const Color(0xFF6750A4),
+              indicatorColor: const Color(0xFF0288D1),
               tabs: const [
                 Tab(text: 'Medicines'),
                 Tab(text: 'Lab Tests'),
@@ -158,13 +165,22 @@ class _PrescriptionAssistantScreenState
                     // Search bar
                     Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF7F7FB),
+                        color: isDarkMode ? Colors.grey[850] : Colors.white,
                         borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDarkMode
+                                ? Colors.black.withOpacity(0.12)
+                                : Colors.black.withOpacity(0.04),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 4),
-                      child: Row(
-                        children: const [
+                      child: const Row(
+                        children: [
                           Icon(Icons.search, color: Colors.grey),
                           SizedBox(width: 8),
                           Expanded(
@@ -202,30 +218,13 @@ class _PrescriptionAssistantScreenState
                   ],
                 ),
                 // Lab Tests Tab
-                Center(child: Text('Lab Tests (UI to be implemented)')),
+                const Center(child: Text('Lab Tests (UI to be implemented)')),
                 // Guidelines Tab
-                Center(child: Text('Guidelines (UI to be implemented)')),
+                const Center(child: Text('Guidelines (UI to be implemented)')),
               ],
             ),
           ),
         ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: const Color(0xFF6750A4),
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home_rounded), label: "Home"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.people_outline), label: "Patients"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.chat_bubble_outline), label: "Chat"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline), label: "Profile"),
-        ],
-        currentIndex: 1,
-        onTap: (index) {},
       ),
     );
   }
@@ -238,10 +237,22 @@ class _MedCard extends StatelessWidget {
   const _MedCard({required this.name, required this.dose, required this.desc});
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: const Color(0xFFF7F7FB),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.grey[850] : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: isDarkMode
+                ? Colors.black.withOpacity(0.12)
+                : Colors.black.withOpacity(0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: ListTile(
         contentPadding:
             const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
@@ -257,11 +268,11 @@ class _MedCard extends StatelessWidget {
         ),
         trailing: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFFEDE7F6),
+            color: isDarkMode ? Colors.grey[900] : const Color(0xFFE6F3FF),
             borderRadius: BorderRadius.circular(20),
           ),
           child: IconButton(
-            icon: const Icon(Icons.add, color: Color(0xFF6750A4)),
+            icon: const Icon(Icons.add, color: Color(0xFF0288D1)),
             onPressed: () {},
           ),
         ),
@@ -275,6 +286,7 @@ class PrescriptionDraftScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     final medicines = [
       {
         'name': 'Sumatriptan',
@@ -311,37 +323,41 @@ class PrescriptionDraftScreen extends StatelessWidget {
         'desc': 'To monitor kidney function and electrolytes',
       },
     ];
-    final notes =
+    const notes =
         "Patient should avoid triggers such as bright lights, loud noises, and alcohol during migraine episodes. Stay hydrated and maintain regular sleep.";
     return Scaffold(
       appBar: AppBar(
         title: const Text('Prescription Draft'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: isDarkMode ? Colors.grey[850] : Colors.white,
+        foregroundColor: const Color(0xFF0288D1),
+        surfaceTintColor: isDarkMode ? Colors.grey[850] : Colors.white,
+        scrolledUnderElevation: 0,
         elevation: 0.5,
         centerTitle: true,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? Colors.grey[900] : const Color(0xFFE6F3FF),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           // Patient header
           Container(
             width: double.infinity,
-            color: Colors.white,
+            color: isDarkMode ? Colors.grey[850] : Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
             child: Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: Colors.pink.shade100,
-                  child:
-                      const Text('HR', style: TextStyle(color: Colors.black)),
+                  backgroundColor: isDarkMode ? Colors.grey[850] : Colors.white,
+                  child: const Text('HR',
+                      style: TextStyle(
+                          color: Color(0xFF0288D1),
+                          fontWeight: FontWeight.bold)),
                 ),
                 const SizedBox(width: 12),
-                Expanded(
+                const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text('Harper Reynolds',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 15)),
@@ -356,77 +372,102 @@ class PrescriptionDraftScreen extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           // Medications
-          Card(
-            color: const Color(0xFFF7F7FB),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Medications',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  ...medicines.map((med) => _DraftMedItem(
-                        name: med['name']!,
-                        dose: med['dose']!,
-                        desc: med['desc']!,
-                        qty: med['qty']!,
-                        refills: med['refills']!,
-                      )),
-                ],
-              ),
+          Container(
+            decoration: BoxDecoration(
+              color: isDarkMode ? Colors.grey[850] : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: isDarkMode
+                      ? Colors.black.withOpacity(0.12)
+                      : Colors.black.withOpacity(0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Medications',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ...medicines.map((med) => _DraftMedItem(
+                      name: med['name']!,
+                      dose: med['dose']!,
+                      desc: med['desc']!,
+                      qty: med['qty']!,
+                      refills: med['refills']!,
+                    )),
+              ],
             ),
           ),
           const SizedBox(height: 16),
           // Lab Tests
-          Card(
-            color: const Color(0xFFF7F7FB),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Lab Tests',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  ...labTests.map((test) => _DraftLabItem(
-                        name: test['name']!,
-                        desc: test['desc']!,
-                      )),
-                ],
-              ),
+          Container(
+            decoration: BoxDecoration(
+              color: isDarkMode ? Colors.grey[850] : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: isDarkMode
+                      ? Colors.black.withOpacity(0.12)
+                      : Colors.black.withOpacity(0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Lab Tests',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ...labTests.map((test) => _DraftLabItem(
+                      name: test['name']!,
+                      desc: test['desc']!,
+                    )),
+              ],
             ),
           ),
           const SizedBox(height: 16),
           // Notes & Instructions
-          Card(
-            color: const Color(0xFFF7F7FB),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Notes & Instructions',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  const SizedBox(height: 8),
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: const EdgeInsets.all(12),
-                    child: Text(notes, style: const TextStyle(fontSize: 14)),
+          Container(
+            decoration: BoxDecoration(
+              color: isDarkMode ? Colors.grey[850] : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: isDarkMode
+                      ? Colors.black.withOpacity(0.12)
+                      : Colors.black.withOpacity(0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Notes & Instructions',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color:
+                        isDarkMode ? Colors.grey[900] : const Color(0xFFE6F3FF),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                ],
-              ),
+                  padding: const EdgeInsets.all(12),
+                  child: Text(notes, style: const TextStyle(fontSize: 14)),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 18),
@@ -445,7 +486,7 @@ class PrescriptionDraftScreen extends StatelessWidget {
                   icon: const Icon(Icons.check, color: Colors.white),
                   label: const Text('Finalize Prescription'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6750A4),
+                    backgroundColor: const Color(0xFF0288D1),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -459,11 +500,11 @@ class PrescriptionDraftScreen extends StatelessWidget {
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
+                    foregroundColor: const Color(0xFF0288D1),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
-                    side: const BorderSide(color: Color(0xFFDFDFDF)),
+                    side: const BorderSide(color: Color(0xFF0288D1)),
                   ),
                   child: const Text('+ Add More'),
                 ),
@@ -566,6 +607,7 @@ class PrescriptionSummaryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     final medicines = [
       {
         'name': 'Sumatriptan',
@@ -596,34 +638,44 @@ class PrescriptionSummaryScreen extends StatelessWidget {
       'Complete Blood Count (CBC)',
       'Basic Metabolic Panel',
     ];
-    final instructions =
+    const instructions =
         "Patient should avoid triggers such as bright lights, loud noises, and alcohol during migraine episodes. Stay hydrated and maintain regular sleep schedule. Schedule follow-up appointment in 2 weeks to assess medication efficacy.";
     return Scaffold(
-      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('Prescription Summary'),
+        backgroundColor: isDarkMode ? Colors.grey[850] : Colors.white,
+        foregroundColor: const Color(0xFF0288D1),
+        surfaceTintColor: isDarkMode ? Colors.grey[850] : Colors.white,
+        scrolledUnderElevation: 0,
+        elevation: 0.5,
+        centerTitle: true,
+      ),
+      backgroundColor: isDarkMode ? Colors.grey[900] : const Color(0xFFE6F3FF),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           Card(
-            color: Colors.white,
+            color: isDarkMode ? Colors.grey[850] : Colors.white,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            elevation: 1,
+            elevation: 0,
+            margin: EdgeInsets.zero,
             child: Padding(
               padding: const EdgeInsets.all(18),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  const Row(
                     children: [
-                      const Text('MedCon',
+                      Text('MedCon',
                           style: TextStyle(
                               fontFamily: 'Pacifico',
-                              color: Color(0xFF6750A4),
+                              color: Color(0xFF0288D1),
                               fontSize: 26)),
-                      const Spacer(),
+                      Spacer(),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
-                        children: const [
+                        children: [
                           Text('Dr. Sarah Chen',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 15)),
@@ -635,9 +687,9 @@ class PrescriptionSummaryScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const Divider(height: 28),
-                  Row(
-                    children: const [
+                  const Divider(height: 28, color: Color(0xFFE6F3FF)),
+                  const Row(
+                    children: [
                       Expanded(
                           child: Text('Patient:\nHarper Reynolds',
                               style: TextStyle(fontSize: 14))),
@@ -648,8 +700,8 @@ class PrescriptionSummaryScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Row(
-                    children: const [
+                  const Row(
+                    children: [
                       Expanded(
                           child: Text('DOB:\nMarch 15, 1983',
                               style: TextStyle(fontSize: 14))),
@@ -659,7 +711,7 @@ class PrescriptionSummaryScreen extends StatelessWidget {
                               style: TextStyle(fontSize: 14))),
                     ],
                   ),
-                  const Divider(height: 28),
+                  const Divider(height: 28, color: Color(0xFFE6F3FF)),
                   const Text('Rx',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
@@ -734,31 +786,47 @@ class PrescriptionSummaryScreen extends StatelessWidget {
                   onPressed: () async {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Row(
-                          children: const [
-                            Icon(Icons.check_circle, color: Colors.green),
-                            SizedBox(width: 10),
-                            Text('Sent to patient'),
-                          ],
+                        content: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.check_circle,
+                                  color: Color(0xFF0288D1), size: 24),
+                              SizedBox(width: 12),
+                              Text(
+                                'Prescription sent successfully!',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         backgroundColor: Colors.white,
                         behavior: SnackBarBehavior.floating,
-                        duration: Duration(seconds: 2),
+                        duration: const Duration(seconds: 3),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        elevation: 6,
+                          borderRadius: BorderRadius.circular(12),
+                          side: const BorderSide(
+                              color: Color(0xFFE6F3FF), width: 1),
+                        ),
+                        elevation: 8,
+                        margin: const EdgeInsets.all(16),
                       ),
                     );
                     await Future.delayed(const Duration(seconds: 2));
                     Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => DoctorDashboard()),
+                      MaterialPageRoute(
+                          builder: (_) => const DoctorDashboard()),
                       (route) => false,
                     );
                   },
                   icon: const Icon(Icons.send),
                   label: const Text('Send to Patient'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6750A4),
+                    backgroundColor: const Color(0xFF0288D1),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -774,11 +842,11 @@ class PrescriptionSummaryScreen extends StatelessWidget {
                   label: const Text('Export PDF'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
+                    foregroundColor: const Color(0xFF0288D1),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
-                    side: const BorderSide(color: Color(0xFFDFDFDF)),
+                    side: const BorderSide(color: Color(0xFF0288D1)),
                   ),
                 ),
               ),

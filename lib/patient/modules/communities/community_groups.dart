@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../profile/patient_dashboard.dart';
 
 class CommunityGroupsScreen extends StatelessWidget {
   const CommunityGroupsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = const Color(0xFF0288D1);
+    const primaryColor = Color(0xFF0288D1);
     final categories = [
       {'icon': Icons.favorite, 'label': 'Heart Health'},
       {'icon': Icons.psychology, 'label': 'Mental Wellness'},
@@ -55,195 +56,207 @@ class CommunityGroupsScreen extends StatelessWidget {
       },
     ];
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.zero,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Search Bar
-              Container(
-                margin: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search groups',
-                    prefixIcon: const Icon(Icons.search),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const DashboardScreen()),
+          (route) => false,
+        );
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F5F5),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.zero,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Search Bar
+                Container(
+                  margin: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search groups',
+                      prefixIcon: Icon(Icons.search),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(vertical: 14),
+                    ),
                   ),
                 ),
-              ),
-              // Buttons
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          elevation: 0,
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const CreateGroupStepper(),
+                // Buttons
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                          );
-                        },
-                        child: const Text('Create New Group',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            elevation: 0,
                           ),
-                          side: BorderSide(color: primaryColor),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          backgroundColor: Colors.white,
-                          elevation: 0,
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const CreateGroupStepper(),
+                              ),
+                            );
+                          },
+                          child: const Text('Create New Group',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
-                        onPressed: () {},
-                        child: Text('Browse Groups',
-                            style: TextStyle(
-                                color: primaryColor,
-                                fontWeight: FontWeight.bold)),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            side: BorderSide(color: primaryColor),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            backgroundColor: Colors.white,
+                            elevation: 0,
+                          ),
+                          onPressed: () {},
+                          child: Text('Browse Groups',
+                              style: TextStyle(
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 18),
-              // Categories
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: const Text('Categories',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              ),
-              const SizedBox(height: 10),
-              Container(
-                height: 90,
-                margin: const EdgeInsets.only(left: 8),
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: categories.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 10),
-                  itemBuilder: (context, i) => Container(
-                    width: 90,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: primaryColor.withOpacity(0.1),
-                          child: Icon(categories[i]['icon'] as IconData,
-                              color: primaryColor, size: 28),
-                          radius: 22,
-                        ),
-                        const SizedBox(height: 6),
-                        Flexible(
-                          child: Text(
-                            categories[i]['label'] as String,
-                            style: const TextStyle(fontSize: 12),
-                            overflow: TextOverflow.ellipsis,
-                            softWrap: false,
+                const SizedBox(height: 18),
+                // Categories
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Text('Categories',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  height: 90,
+                  margin: const EdgeInsets.only(left: 8),
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categories.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 10),
+                    itemBuilder: (context, i) => Container(
+                      width: 90,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: primaryColor.withOpacity(0.1),
+                            radius: 22,
+                            child: Icon(categories[i]['icon'] as IconData,
+                                color: primaryColor, size: 28),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 6),
+                          Flexible(
+                            child: Text(
+                              categories[i]['label'] as String,
+                              style: const TextStyle(fontSize: 12),
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: false,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 18),
-              // Your Groups
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Your Groups',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
-                    TextButton(onPressed: () {}, child: const Text('See All')),
-                  ],
+                const SizedBox(height: 18),
+                // Your Groups
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Your Groups',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      TextButton(
+                          onPressed: () {}, child: const Text('See All')),
+                    ],
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: yourGroups.length,
-                  itemBuilder: (context, index) =>
-                      _GroupCard(group: yourGroups[index], isYourGroup: true),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: yourGroups.length,
+                    itemBuilder: (context, index) =>
+                        _GroupCard(group: yourGroups[index], isYourGroup: true),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              // Recommended For You
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Recommended For You',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16)),
-                    TextButton(onPressed: () {}, child: const Text('See All')),
-                  ],
+                const SizedBox(height: 10),
+                // Recommended For You
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Recommended For You',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      TextButton(
+                          onPressed: () {}, child: const Text('See All')),
+                    ],
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: recommendedGroups.length,
-                  itemBuilder: (context, index) => GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => GroupDetailsScreen(
-                            group: recommendedGroups[index],
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: recommendedGroups.length,
+                    itemBuilder: (context, index) => GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => GroupDetailsScreen(
+                              group: recommendedGroups[index],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    child: _GroupCard(
-                      group: recommendedGroups[index],
-                      isYourGroup: false,
+                        );
+                      },
+                      child: _GroupCard(
+                        group: recommendedGroups[index],
+                        isYourGroup: false,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 80),
-            ],
+                const SizedBox(height: 80),
+              ],
+            ),
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: primaryColor,
-        onPressed: () {},
-        heroTag: 'communityGroupsFAB',
-        child: const Icon(Icons.add, size: 32),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: primaryColor,
+          onPressed: () {},
+          heroTag: 'communityGroupsFAB',
+          child: const Icon(Icons.add, size: 32),
+        ),
       ),
     );
   }
@@ -256,7 +269,7 @@ class _GroupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = const Color(0xFF0288D1);
+    const primaryColor = Color(0xFF0288D1);
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 7),
       decoration: BoxDecoration(
@@ -277,9 +290,9 @@ class _GroupCard extends StatelessWidget {
           children: [
             CircleAvatar(
               backgroundColor: primaryColor.withOpacity(0.08),
+              radius: 26,
               child: Icon(group['icon'] as IconData,
                   color: primaryColor, size: 28),
-              radius: 26,
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -395,7 +408,7 @@ class _CreateGroupStepperState extends State<CreateGroupStepper> {
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = const Color(0xFF0288D1);
+    const primaryColor = Color(0xFF0288D1);
     final categories = [
       'Heart Health',
       'Mental Wellness',
@@ -404,17 +417,17 @@ class _CreateGroupStepperState extends State<CreateGroupStepper> {
     ];
 
     if (isLoading) {
-      return Scaffold(
-        backgroundColor: const Color(0xFFF5F5F5),
+      return const Scaffold(
+        backgroundColor: Color(0xFFF5F5F5),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CircularProgressIndicator(
+              CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0288D1)),
               ),
-              const SizedBox(height: 20),
-              const Text(
+              SizedBox(height: 20),
+              Text(
                 'Creating your group...',
                 style: TextStyle(
                   fontSize: 16,
@@ -496,22 +509,6 @@ class _CreateGroupStepperState extends State<CreateGroupStepper> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.white,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text('Create New Group',
-            style: TextStyle(color: Colors.black)),
-        centerTitle: true,
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -667,6 +664,8 @@ class _CreateGroupStepperState extends State<CreateGroupStepper> {
 
 // Dotted border box for image upload
 class DottedBorderBox extends StatelessWidget {
+  const DottedBorderBox({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -681,10 +680,10 @@ class DottedBorderBox extends StatelessWidget {
           width: 1.2,
         ),
       ),
-      child: Center(
+      child: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             Icon(Icons.add_photo_alternate_outlined,
                 size: 38, color: Colors.grey),
             SizedBox(height: 8),
@@ -952,11 +951,11 @@ class GroupDetailsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12)),
                 color: Colors.white,
                 elevation: 0,
-                child: Padding(
-                  padding: const EdgeInsets.all(14.0),
+                child: const Padding(
+                  padding: EdgeInsets.all(14.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text('1. Be respectful and supportive.'),
                       SizedBox(height: 4),
                       Text('2. No spam or self-promotion.'),
@@ -978,18 +977,18 @@ class GroupDetailsScreen extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
-                color: Color(0xFFF3F6FD),
+                color: const Color(0xFFF3F6FD),
                 elevation: 0,
-                child: Padding(
-                  padding: const EdgeInsets.all(14.0),
+                child: const Padding(
+                  padding: EdgeInsets.all(14.0),
                   child: Row(
                     children: [
-                      const Icon(Icons.push_pin, color: Color(0xFF2253F2)),
-                      const SizedBox(width: 10),
+                      Icon(Icons.push_pin, color: Color(0xFF2253F2)),
+                      SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text('Group meeting this Friday at 5 PM!',
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                             SizedBox(height: 2),
@@ -1020,7 +1019,7 @@ class GroupDetailsScreen extends StatelessWidget {
                 itemBuilder: (context, i) => ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: Image.network(
-                    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=8${i}',
+                    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=8$i',
                     width: 90,
                     height: 80,
                     fit: BoxFit.cover,
@@ -1041,22 +1040,22 @@ class GroupDetailsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14)),
                 elevation: 0,
                 color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(14.0),
+                child: const Padding(
+                  padding: EdgeInsets.all(14.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          const CircleAvatar(
+                          CircleAvatar(
                             radius: 18,
                             backgroundImage: NetworkImage(
                                 'https://randomuser.me/api/portraits/women/44.jpg'),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text('Dr. Sarah Johnson',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
@@ -1067,12 +1066,12 @@ class GroupDetailsScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
-                      const Text(
+                      SizedBox(height: 10),
+                      Text(
                         "Welcome to our new members! This week we'll be discussing heart-healthy diet options. Feel free to share your favorite recipes in the comments!",
                         style: TextStyle(fontSize: 14),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       ClipRRect(
                         borderRadius: BorderRadius.all(Radius.circular(12)),
                         child: Image(

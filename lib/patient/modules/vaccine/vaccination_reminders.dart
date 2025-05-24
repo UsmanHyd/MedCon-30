@@ -55,6 +55,7 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
     String dateGiven = '';
     String nextDoseDate = '';
     String notes = '';
+    TimeOfDay reminderTime = TimeOfDay.now();
 
     Future<void> pickDate(
         BuildContext context, Function(String) onPicked) async {
@@ -66,6 +67,18 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
       );
       if (picked != null) {
         onPicked(picked.toIso8601String().substring(0, 10));
+      }
+    }
+
+    Future<void> pickTime(BuildContext context) async {
+      final picked = await showTimePicker(
+        context: context,
+        initialTime: reminderTime,
+      );
+      if (picked != null) {
+        setState(() {
+          reminderTime = picked;
+        });
       }
     }
 
@@ -174,6 +187,38 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
+                    const Text('Reminder Time *',
+                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 6),
+                    Stack(
+                      alignment: Alignment.centerRight,
+                      children: [
+                        TextFormField(
+                          readOnly: true,
+                          controller: TextEditingController(
+                            text: reminderTime.format(context),
+                          ),
+                          decoration: const InputDecoration(
+                            hintText: 'Select reminder time',
+                            border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 12),
+                          ),
+                          validator: (value) => value == null || value.isEmpty
+                              ? 'Reminder time is required'
+                              : null,
+                          onTap: () => pickTime(context),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.access_time,
+                              size: 20, color: Colors.blueGrey),
+                          onPressed: () => pickTime(context),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 4),
                     const Text(
                       'Setting reminder is required for tracking',
@@ -235,6 +280,8 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                                     'status': 'Pending',
                                     'notes': notes,
                                     'userId': currentUser?.uid,
+                                    'reminderTime':
+                                        '${reminderTime.hour}:${reminderTime.minute}',
                                   };
                                   print(
                                       'Debug - Reminder data being sent: $reminderData');
@@ -291,6 +338,14 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
         : '';
     String notes = rec['notes'] ?? '';
     String status = rec['status'] ?? 'Pending';
+    TimeOfDay reminderTime = TimeOfDay.now();
+    if (rec['reminderTime'] != null) {
+      final timeParts = rec['reminderTime'].split(':');
+      reminderTime = TimeOfDay(
+        hour: int.parse(timeParts[0]),
+        minute: int.parse(timeParts[1]),
+      );
+    }
 
     Future<void> pickDate(
         BuildContext context, Function(String) onPicked, String initial) async {
@@ -303,6 +358,18 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
       );
       if (picked != null) {
         onPicked(picked.toIso8601String().substring(0, 10));
+      }
+    }
+
+    Future<void> pickTime(BuildContext context) async {
+      final picked = await showTimePicker(
+        context: context,
+        initialTime: reminderTime,
+      );
+      if (picked != null) {
+        setState(() {
+          reminderTime = picked;
+        });
       }
     }
 
@@ -412,6 +479,38 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
+                    const Text('Reminder Time *',
+                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 6),
+                    Stack(
+                      alignment: Alignment.centerRight,
+                      children: [
+                        TextFormField(
+                          readOnly: true,
+                          controller: TextEditingController(
+                            text: reminderTime.format(context),
+                          ),
+                          decoration: const InputDecoration(
+                            hintText: 'Select reminder time',
+                            border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 12),
+                          ),
+                          validator: (value) => value == null || value.isEmpty
+                              ? 'Reminder time is required'
+                              : null,
+                          onTap: () => pickTime(context),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.access_time,
+                              size: 20, color: Colors.blueGrey),
+                          onPressed: () => pickTime(context),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 4),
                     const Text(
                       'Setting reminder is required for tracking',
@@ -470,6 +569,8 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                                     'dates': [dateGiven, nextDoseDate],
                                     'status': status,
                                     'notes': notes,
+                                    'reminderTime':
+                                        '${reminderTime.hour}:${reminderTime.minute}',
                                   },
                                 );
                                 Navigator.of(context).pop();
@@ -529,6 +630,14 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                     (rec['dates'] != null && rec['dates'].length > 1)
                         ? rec['dates'][1]
                         : '-',
+                    style: const TextStyle(fontSize: 15)),
+                const SizedBox(height: 10),
+                const Text('Reminder Time',
+                    style: TextStyle(fontWeight: FontWeight.w500)),
+                Text(
+                    rec['reminderTime'] != null
+                        ? '${rec['reminderTime']}'
+                        : 'Not set',
                     style: const TextStyle(fontSize: 15)),
                 const SizedBox(height: 10),
                 const Text('Notes',
@@ -677,9 +786,30 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                         label: const Text('Delete',
                             style: TextStyle(color: Colors.white)),
                         onPressed: () async {
-                          await FirestoreService()
-                              .deleteVaccinationReminder(rec['id']);
-                          Navigator.of(context).pop();
+                          try {
+                            await FirestoreService()
+                                .deleteVaccinationReminder(rec['id']);
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      'Vaccination record deleted successfully'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              Navigator.of(context).pop();
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Error deleting record: ${e.toString()}'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
                         },
                       ),
                     ),

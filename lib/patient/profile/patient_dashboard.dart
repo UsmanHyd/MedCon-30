@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:medcon30/patient/modules/chatbot.dart';
+import 'package:medcon30/patient/modules/chatbot/chatbot.dart';
 import 'package:medcon30/patient/modules/communities/community_groups.dart';
 import 'package:medcon30/patient/modules/disease/disease_detection.dart';
 import 'package:medcon30/patient/modules/heart/heart_disease.dart';
 import 'package:medcon30/patient/modules/nutrition/nutrition_fitness.dart';
-import 'package:medcon30/patient/profile_display.dart';
-import 'package:medcon30/patient/profile_creation.dart';
+import 'package:medcon30/patient/profile/profile_display.dart';
+import 'package:medcon30/patient/profile/profile_creation.dart';
 import 'package:provider/provider.dart';
 import 'package:medcon30/theme/theme_provider.dart';
-import 'modules/stress/stress_monitoring.dart';
+import '../modules/stress/stress_monitoring.dart';
 import 'package:medcon30/patient/modules/vaccine/vaccination_reminders.dart';
 import 'package:medcon30/patient/modules/SOS/sos_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:medcon30/patient/profile/profile_gate.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -63,9 +64,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _getScreenForIndex(int index) {
     if (index == 2) {
-      return _hasProfile
-          ? const ProfileDisplayScreen()
-          : const ProfileCreationScreen();
+      return const ProfileGateScreen();
     }
     return _screens[index];
   }
@@ -73,7 +72,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final List<Widget> _screens = const [
     CommunityGroupsScreen(),
     _DashboardContent(),
-    ProfileDisplayScreen(),
+    ProfileGateScreen(),
   ];
 
   final List<String> _titles = ['Community Groups', 'Dashboard', 'Profile'];
@@ -87,113 +86,169 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
 
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(
+      return Scaffold(
+        backgroundColor:
+            isDarkMode ? Colors.grey[900] : const Color(0xFFF5F5F5),
+        body: const Center(
           child: CircularProgressIndicator(),
         ),
       );
     }
 
-    return Scaffold(
-      extendBody: true,
-      backgroundColor:
-          themeProvider.isDarkMode ? Colors.grey[900] : const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        title: Text(_titles[_currentIndex]),
-        backgroundColor:
-            themeProvider.isDarkMode ? Colors.grey[850] : Colors.white,
-        foregroundColor: const Color(0xFF0288D1),
-        elevation: 0,
-        actions: [
-          // Theme Toggle Switch
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              children: [
-                Icon(
-                  themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode,
-                  color: const Color(0xFF0288D1),
-                ),
-                Switch(
-                  value: themeProvider.isDarkMode,
-                  onChanged: (value) {
-                    themeProvider.toggleTheme();
-                  },
-                  activeColor: const Color(0xFF0288D1),
-                ),
-              ],
-            ),
+    return WillPopScope(
+      onWillPop: () async {
+        // Show confirmation dialog
+        final shouldPop = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Exit App'),
+            content: const Text('Are you sure you want to exit?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('No'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Yes'),
+              ),
+            ],
           ),
-          // Notification Button
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            color: const Color(0xFF0288D1),
-            onPressed: () {
-              // TODO: Implement notification functionality
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Notifications coming soon!')),
+        );
+        return shouldPop ?? false;
+      },
+      child: Scaffold(
+        extendBody: true,
+        backgroundColor:
+            isDarkMode ? Colors.grey[900] : const Color(0xFFF5F5F5),
+        appBar: AppBar(
+          title: Text(_titles[_currentIndex]),
+          backgroundColor: isDarkMode ? Colors.grey[850] : Colors.white,
+          foregroundColor: const Color(0xFF0288D1),
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () async {
+              final shouldPop = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Exit App'),
+                  content: const Text('Are you sure you want to exit?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('No'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Yes'),
+                    ),
+                  ],
+                ),
               );
+              if (shouldPop ?? false) {
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
+              }
             },
           ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: _getScreenForIndex(_currentIndex),
-          ),
-          if (_showChatbot)
-            Positioned(
-              bottom: 80,
-              right: 20,
-              child: ChatbotScreen(
-                onClose: () {
-                  setState(() {
-                    _showChatbot = false;
-                  });
-                },
+          actions: [
+            // Theme Toggle Switch
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                children: [
+                  Icon(
+                    isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                    color: const Color(0xFF0288D1),
+                  ),
+                  Switch(
+                    value: isDarkMode,
+                    onChanged: (value) {
+                      themeProvider.toggleTheme();
+                    },
+                    activeColor: const Color(0xFF0288D1),
+                  ),
+                ],
               ),
             ),
-        ],
-      ),
-      bottomNavigationBar: AnimatedCurveNavBar(
-        onTabChanged: _handleTabChange,
-        initialIndex: _currentIndex,
-        items: const [
-          NavBarItem(
-            icon: Icons.group,
-            label: "Groups",
-            highlightColor: Color(0xFF0288D1),
-          ),
-          NavBarItem(
-            icon: Icons.home,
-            label: "Home",
-            highlightColor: Color(0xFF0288D1),
-          ),
-          NavBarItem(
-            icon: Icons.person,
-            label: "Profile",
-            highlightColor: Color(0xFF0288D1),
-          ),
-        ],
-      ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 10.0),
-        child: FloatingActionButton(
-          onPressed: () {
-            setState(() {
-              _showChatbot = true;
-            });
-          },
-          backgroundColor: const Color(0xFF0288D1),
-          tooltip: 'Open Chatbot',
-          child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
+            // Notification Button
+            IconButton(
+              icon: const Icon(Icons.notifications),
+              color: const Color(0xFF0288D1),
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Notifications coming soon!'),
+                    backgroundColor:
+                        isDarkMode ? Colors.grey[800] : Colors.white,
+                  ),
+                );
+              },
+            ),
+          ],
         ),
+        body: Stack(
+          children: [
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: _getScreenForIndex(_currentIndex),
+            ),
+            if (_showChatbot)
+              Positioned(
+                bottom: 80,
+                right: 20,
+                child: ChatbotScreen(
+                  onClose: () {
+                    setState(() {
+                      _showChatbot = false;
+                    });
+                  },
+                ),
+              ),
+          ],
+        ),
+        bottomNavigationBar: AnimatedCurveNavBar(
+          onTabChanged: _handleTabChange,
+          initialIndex: _currentIndex,
+          items: const [
+            NavBarItem(
+              icon: Icons.group,
+              label: "Groups",
+              highlightColor: Color(0xFF0288D1),
+            ),
+            NavBarItem(
+              icon: Icons.home,
+              label: "Home",
+              highlightColor: Color(0xFF0288D1),
+            ),
+            NavBarItem(
+              icon: Icons.person,
+              label: "Profile",
+              highlightColor: Color(0xFF0288D1),
+            ),
+          ],
+        ),
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 10.0),
+          child: FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                _showChatbot = true;
+              });
+            },
+            backgroundColor: const Color(0xFF0288D1),
+            tooltip: 'Open Chatbot',
+            child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
@@ -203,7 +258,7 @@ class _DashboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<ThemeProvider>(context);
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
 
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -224,7 +279,9 @@ class _DashboardContent extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
+                    color: isDarkMode
+                        ? Colors.black.withOpacity(0.3)
+                        : Colors.grey.withOpacity(0.2),
                     blurRadius: 10,
                     offset: const Offset(0, 5),
                   ),
@@ -275,7 +332,8 @@ class _DashboardContent extends StatelessWidget {
               title: 'Disease Detection',
               description: 'Get instant analysis of your symptoms',
               icon: Icons.local_hospital,
-              iconColor: Color(0xFF0288D1),
+              iconColor: const Color(0xFF0288D1),
+              isDarkMode: isDarkMode,
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -289,6 +347,7 @@ class _DashboardContent extends StatelessWidget {
               description: 'Track and manage your stress levels',
               icon: Icons.accessibility_new,
               iconColor: const Color(0xFF0288D1),
+              isDarkMode: isDarkMode,
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -301,6 +360,7 @@ class _DashboardContent extends StatelessWidget {
               description: 'Never miss an important vaccination',
               icon: Icons.notifications,
               iconColor: const Color(0xFF0288D1),
+              isDarkMode: isDarkMode,
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -309,12 +369,12 @@ class _DashboardContent extends StatelessWidget {
                 );
               },
             ),
-            // SOS Button
             _DashboardOption(
               title: 'Emergency SOS',
               description: 'Access emergency help and features',
               icon: Icons.warning_amber_rounded,
               iconColor: Colors.red,
+              isDarkMode: isDarkMode,
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -327,7 +387,8 @@ class _DashboardContent extends StatelessWidget {
               title: 'Heart Disease Detector',
               description: 'Monitor your heart health',
               icon: Icons.favorite,
-              iconColor: Color(0xFF0288D1),
+              iconColor: const Color(0xFF0288D1),
+              isDarkMode: isDarkMode,
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -340,7 +401,8 @@ class _DashboardContent extends StatelessWidget {
               title: 'Nutrition & Fitness Planning',
               description: 'Get personalized diet and exercise plans',
               icon: Icons.fitness_center,
-              iconColor: Color(0xFF0288D1),
+              iconColor: const Color(0xFF0288D1),
+              isDarkMode: isDarkMode,
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -362,6 +424,7 @@ class _DashboardOption extends StatelessWidget {
   final String description;
   final IconData icon;
   final Color iconColor;
+  final bool isDarkMode;
   final VoidCallback? onTap;
 
   const _DashboardOption({
@@ -369,6 +432,7 @@ class _DashboardOption extends StatelessWidget {
     required this.description,
     required this.icon,
     required this.iconColor,
+    required this.isDarkMode,
     this.onTap,
   });
 
@@ -377,11 +441,13 @@ class _DashboardOption extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode ? Colors.grey[850] : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: isDarkMode
+                ? Colors.black.withOpacity(0.2)
+                : Colors.grey.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -393,36 +459,42 @@ class _DashboardOption extends StatelessWidget {
           width: 50,
           height: 50,
           decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.1),
+            color: iconColor.withOpacity(isDarkMode ? 0.2 : 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: iconColor, size: 28),
         ),
         title: Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: isDarkMode ? Colors.white : Colors.black,
           ),
         ),
         subtitle: Text(
           description,
-          style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+          style: TextStyle(
+            fontSize: 14,
+            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+          ),
         ),
         trailing: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.1),
+            color: iconColor.withOpacity(isDarkMode ? 0.2 : 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(Icons.arrow_forward_ios, color: iconColor, size: 16),
         ),
         onTap: onTap ??
             () {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text('Tapped: $title')));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Tapped: $title'),
+                  backgroundColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                ),
+              );
             },
       ),
     );

@@ -53,9 +53,9 @@ class HeartAnalysisResultScreen extends StatelessWidget {
                     radius: 38,
                     lineWidth: 8,
                     percent: 0.24,
-                    center: Column(
+                    center: const Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Text('24%',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 22)),
@@ -122,21 +122,21 @@ class HeartAnalysisResultScreen extends StatelessWidget {
                   const SizedBox(height: 14),
                   _findingRow(
                     icon: Icons.favorite,
-                    iconColor: Color(0xFF7B9EFF),
+                    iconColor: const Color(0xFF7B9EFF),
                     title: 'Blood Pressure',
                     value: '120/80 mmHg - Within normal range',
                   ),
                   const SizedBox(height: 12),
                   _findingRow(
                     icon: Icons.monitor_heart,
-                    iconColor: Color(0xFF4ADE80),
+                    iconColor: const Color(0xFF4ADE80),
                     title: 'Heart Rate',
                     value: '72 BPM - Normal resting heart rate',
                   ),
                   const SizedBox(height: 12),
                   _findingRow(
                     icon: Icons.egg_alt,
-                    iconColor: Color(0xFFFFE066),
+                    iconColor: const Color(0xFFFFE066),
                     title: 'Cholesterol Levels',
                     value: 'Total: 210 mg/dL - Slightly elevated',
                   ),
@@ -168,7 +168,7 @@ class HeartAnalysisResultScreen extends StatelessWidget {
                   const SizedBox(height: 14),
                   _recommendationRow(
                     icon: Icons.restaurant,
-                    iconColor: Color(0xFF22C55E),
+                    iconColor: const Color(0xFF22C55E),
                     title: 'Diet',
                     description:
                         'Consider reducing saturated fats to help manage cholesterol levels',
@@ -176,7 +176,7 @@ class HeartAnalysisResultScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   _recommendationRow(
                     icon: Icons.directions_run,
-                    iconColor: Color(0xFF7B61FF),
+                    iconColor: const Color(0xFF7B61FF),
                     title: 'Exercise',
                     description:
                         'Maintain your current exercise routine of 150 minutes per week',
@@ -184,7 +184,7 @@ class HeartAnalysisResultScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   _recommendationRow(
                     icon: Icons.calendar_today,
-                    iconColor: Color(0xFF0288D1),
+                    iconColor: const Color(0xFF0288D1),
                     title: 'Follow-up',
                     description: 'Schedule your next check-up in 6 months',
                   ),

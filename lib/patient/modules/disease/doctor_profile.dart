@@ -5,13 +5,13 @@ class DoctorProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF4F9FD),
+      backgroundColor: const Color(0xFFE0F7FA),
       body: SafeArea(
         child: Column(
           children: [
             // Top bar
             Container(
-              color: Colors.white,
+              color: const Color(0xFFE0F7FA),
               padding: EdgeInsets.symmetric(horizontal: 0, vertical: 16),
               child: Row(
                 children: [
@@ -61,7 +61,7 @@ class DoctorProfileScreen extends StatelessWidget {
                     transform: Matrix4.translationValues(0, -32, 0),
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color(0xFFE0F7FA),
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
@@ -191,7 +191,7 @@ class DoctorProfileScreen extends StatelessWidget {
                     margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                     padding: EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color(0xFFE0F7FA),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: RichText(
@@ -214,7 +214,7 @@ class DoctorProfileScreen extends StatelessWidget {
                     margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     padding: EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color(0xFFE0F7FA),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Column(
@@ -252,7 +252,7 @@ class DoctorProfileScreen extends StatelessWidget {
                     margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                     padding: EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color(0xFFE0F7FA),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Column(
@@ -284,7 +284,7 @@ class DoctorProfileScreen extends StatelessWidget {
                     margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     padding: EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color(0xFFE0F7FA),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Column(

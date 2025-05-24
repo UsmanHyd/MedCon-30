@@ -1,14 +1,17 @@
+import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import 'package:medcon30/theme/theme_provider.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Sign up with email & password
-  Future<UserCredential?> signUp(
-      String email, String password, String phoneNumber, String role) async {
+  Future<UserCredential?> signUp(String email, String password,
+      String phoneNumber, String role, String name) async {
     try {
       final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -19,6 +22,7 @@ class AuthService {
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
         'email': email,
         'phoneNumber': phoneNumber,
+        'name': name,
         'role': role,
         'createdAt': FieldValue.serverTimestamp(),
       });
@@ -140,9 +144,15 @@ class AuthService {
   }
 
   // Sign out
-  Future<void> signOut() async {
-    await _auth.signOut();
-    await GoogleSignIn().signOut();
+  Future<void> signOut(BuildContext context) async {
+    try {
+      await _auth.signOut();
+      await GoogleSignIn().signOut();
+      // Reset theme to light mode
+      Provider.of<ThemeProvider>(context, listen: false).resetToLightMode();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   // Send password reset email

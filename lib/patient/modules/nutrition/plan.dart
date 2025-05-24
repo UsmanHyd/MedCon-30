@@ -98,21 +98,21 @@ class _PlanScreenState extends State<PlanScreen> {
             const Text('Meal Plan',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 12),
-            _MealCard(
+            const _MealCard(
               icon: Icons.breakfast_dining,
               title: 'Breakfast',
               subtitle: 'Greek yogurt with berries and granola',
               time: '7:30 AM',
             ),
             const SizedBox(height: 12),
-            _MealCard(
+            const _MealCard(
               icon: Icons.lunch_dining,
               title: 'Lunch',
               subtitle: 'Grilled chicken salad with quinoa',
               time: '12:30 PM',
             ),
             const SizedBox(height: 12),
-            _MealCard(
+            const _MealCard(
               icon: Icons.dinner_dining,
               title: 'Dinner',
               subtitle: 'Baked salmon with roasted vegetables',
@@ -122,14 +122,14 @@ class _PlanScreenState extends State<PlanScreen> {
             const Text('Workout Plan',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 12),
-            _MealCard(
+            const _MealCard(
               icon: Icons.directions_run,
               title: 'Cardio',
               subtitle: '30 min jogging or brisk walking',
               time: '6:00 AM',
             ),
             const SizedBox(height: 12),
-            _MealCard(
+            const _MealCard(
               icon: Icons.fitness_center,
               title: 'Strength Training',
               subtitle: 'Upper body workout - 3 sets of 12 reps',

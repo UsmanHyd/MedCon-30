@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'doctor_profile.dart';
 
 class SearchDoctorScreen extends StatefulWidget {
+  const SearchDoctorScreen({super.key});
+
   @override
   State<SearchDoctorScreen> createState() => _SearchDoctorScreenState();
 }
@@ -51,14 +53,14 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF4F9FD),
+      backgroundColor: const Color(0xFFE0F7FA),
       body: SafeArea(
         child: Column(
           children: [
             // Top bar
             Container(
-              color: Colors.white,
-              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 16),
+              color: const Color(0xFFE0F7FA),
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16),
               child: Row(
                 children: [
                   IconButton(
@@ -78,31 +80,31 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 18.0),
+                  const Padding(
+                    padding: EdgeInsets.only(right: 18.0),
                     child: Icon(Icons.help_outline,
                         color: Color(0xFF2196F3), size: 20),
                   ),
                 ],
               ),
             ),
-            Divider(height: 1, thickness: 1, color: Color(0xFFE0E3EA)),
+            const Divider(height: 1, thickness: 1, color: Color(0xFFE0E3EA)),
             // Filters
             Container(
-              color: Color(0xFFF4F9FD),
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              color: const Color(0xFFE0F7FA),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: List.generate(filters.length, (i) {
                     final selected = selectedFilter == i;
                     return Padding(
-                      padding: EdgeInsets.only(right: 10),
+                      padding: const EdgeInsets.only(right: 10),
                       child: ChoiceChip(
                         label: Text(filters[i]),
                         selected: selected,
                         onSelected: (_) => setState(() => selectedFilter = i),
-                        selectedColor: Color(0xFF2196F3),
+                        selectedColor: const Color(0xFF2196F3),
                         backgroundColor: Colors.white,
                         labelStyle: TextStyle(
                           color: selected ? Colors.white : Colors.blueGrey[900],
@@ -112,8 +114,8 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                           borderRadius: BorderRadius.circular(12),
                           side: BorderSide(
                             color: selected
-                                ? Color(0xFF2196F3)
-                                : Color(0xFFE0E3EA),
+                                ? const Color(0xFF2196F3)
+                                : const Color(0xFFE0E3EA),
                             width: 1.5,
                           ),
                         ),
@@ -126,13 +128,14 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
             // Doctor cards
             Expanded(
               child: ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                 itemCount: doctors.length,
                 itemBuilder: (context, i) {
                   final doc = doctors[i];
                   return Container(
-                    margin: EdgeInsets.only(bottom: 18),
-                    padding: EdgeInsets.all(14),
+                    margin: const EdgeInsets.only(bottom: 18),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14),
@@ -140,7 +143,7 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                         BoxShadow(
                           color: Colors.black.withOpacity(0.04),
                           blurRadius: 8,
-                          offset: Offset(0, 2),
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
@@ -160,7 +163,7 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(width: 14),
+                        const SizedBox(width: 14),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,7 +176,7 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                                   color: Colors.blueGrey[900],
                                 ),
                               ),
-                              SizedBox(height: 2),
+                              const SizedBox(height: 2),
                               Text(
                                 doc['specialty'],
                                 style: TextStyle(
@@ -181,12 +184,12 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                                   fontSize: 14,
                                 ),
                               ),
-                              SizedBox(height: 6),
+                              const SizedBox(height: 6),
                               Row(
                                 children: [
-                                  Icon(Icons.star,
+                                  const Icon(Icons.star,
                                       color: Color(0xFFFFC107), size: 18),
-                                  SizedBox(width: 2),
+                                  const SizedBox(width: 2),
                                   Text(
                                     '${doc['rating']}',
                                     style: TextStyle(
@@ -195,7 +198,7 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                                       fontSize: 14,
                                     ),
                                   ),
-                                  SizedBox(width: 2),
+                                  const SizedBox(width: 2),
                                   Text(
                                     '(${doc['reviews']})',
                                     style: TextStyle(
@@ -205,16 +208,16 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 2),
+                              const SizedBox(height: 2),
                               if (doc['available'] != '')
                                 Row(
                                   children: [
-                                    Icon(Icons.circle,
+                                    const Icon(Icons.circle,
                                         color: Color(0xFF4CAF50), size: 10),
-                                    SizedBox(width: 4),
+                                    const SizedBox(width: 4),
                                     Text(
                                       doc['available'],
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Color(0xFF4CAF50),
                                         fontSize: 13,
                                         fontWeight: FontWeight.w500,
@@ -225,12 +228,12 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                               if (doc['nextAvailable'] != '')
                                 Row(
                                   children: [
-                                    Icon(Icons.access_time,
+                                    const Icon(Icons.access_time,
                                         color: Color(0xFFFF9800), size: 14),
-                                    SizedBox(width: 4),
+                                    const SizedBox(width: 4),
                                     Text(
                                       doc['nextAvailable'],
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Color(0xFFFF9800),
                                         fontSize: 13,
                                         fontWeight: FontWeight.w500,
@@ -244,7 +247,7 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            SizedBox(height: 34),
+                            const SizedBox(height: 34),
                             ElevatedButton(
                               onPressed: () {
                                 Navigator.push(
@@ -255,15 +258,16 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                                 );
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF2196F3),
-                                minimumSize: Size(60, 32),
-                                padding: EdgeInsets.symmetric(horizontal: 18),
+                                backgroundColor: const Color(0xFF2196F3),
+                                minimumSize: const Size(60, 32),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 18),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 elevation: 0,
                               ),
-                              child: Text(
+                              child: const Text(
                                 'View',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
