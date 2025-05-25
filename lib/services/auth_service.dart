@@ -163,4 +163,34 @@ class AuthService {
       rethrow;
     }
   }
+
+  // Check current authentication state and role
+  Future<Map<String, dynamic>?> checkAuthState() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        return null;
+      }
+
+      final userDoc = await _firestore.collection('users').doc(user.uid).get();
+      if (!userDoc.exists) {
+        return null;
+      }
+
+      final userData = userDoc.data();
+      if (userData == null) {
+        return null;
+      }
+
+      return {
+        'uid': user.uid,
+        'role': userData['role'],
+        'email': userData['email'],
+        'name': userData['name'],
+      };
+    } catch (e) {
+      print('Error checking auth state: $e');
+      return null;
+    }
+  }
 }

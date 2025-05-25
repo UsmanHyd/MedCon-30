@@ -48,6 +48,9 @@ dependencies:
   google_sign_in: ^6.3.0
   font_awesome_flutter: ^10.8.0
   image_cropper: ^9.1.0
+  http: ^1.4.0
+  mime: ^1.0.4
+  http_parser: ^4.0.2
 
 dev_dependencies:
   flutter_test:

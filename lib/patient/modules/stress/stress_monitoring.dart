@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:medcon30/theme/theme_provider.dart';
 import 'stress_module.dart';
 import 'stress_track.dart';
 import 'stress_detailed_insights.dart';
+import 'stress_survey.dart';
 
 class StressMonitoringScreen extends StatefulWidget {
   const StressMonitoringScreen({super.key});
@@ -20,6 +23,16 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
   }
 
   Widget _buildHomeContent() {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final bgColor = isDarkMode ? const Color(0xFF121212) : Colors.white;
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor =
+        isDarkMode ? const Color(0xFFB0B0B0) : const Color(0xFF757575);
+    final shadowColor = isDarkMode
+        ? Colors.black.withOpacity(0.2)
+        : Colors.grey.withOpacity(0.08);
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
@@ -39,6 +52,10 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
                   ),
                 );
               },
+              cardColor: cardColor,
+              textColor: textColor,
+              subTextColor: subTextColor,
+              shadowColor: shadowColor,
             ),
             const SizedBox(height: 12),
             _mainCard(
@@ -52,8 +69,8 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
                     builder: (context) => Scaffold(
                       appBar: AppBar(
                         title: const Text('Stress Modules'),
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
+                        backgroundColor: cardColor,
+                        foregroundColor: textColor,
                         elevation: 0,
                       ),
                       body: const StressModulesScreen(),
@@ -61,6 +78,10 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
                   ),
                 );
               },
+              cardColor: cardColor,
+              textColor: textColor,
+              subTextColor: subTextColor,
+              shadowColor: shadowColor,
             ),
             const SizedBox(height: 12),
             _mainCard(
@@ -75,16 +96,27 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
                   ),
                 );
               },
+              cardColor: cardColor,
+              textColor: textColor,
+              subTextColor: subTextColor,
+              shadowColor: shadowColor,
             ),
             const SizedBox(height: 24),
-            const Text('Recent Activity',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text('Recent Activity',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: textColor)),
             const SizedBox(height: 12),
             _activityCard(
               icon: Icons.self_improvement,
               iconColor: const Color(0xFF7B9EFF),
               title: '5-min Breathing Exercise',
               subtitle: 'Completed yesterday',
+              cardColor: cardColor,
+              textColor: textColor,
+              subTextColor: subTextColor,
+              shadowColor: shadowColor,
             ),
             const SizedBox(height: 8),
             _activityCard(
@@ -92,9 +124,18 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
               iconColor: const Color(0xFF7B61FF),
               title: 'Stress Survey',
               subtitle: 'Completed 3 days ago',
+              cardColor: cardColor,
+              textColor: textColor,
+              subTextColor: subTextColor,
+              shadowColor: shadowColor,
             ),
             const SizedBox(height: 16),
-            _dailyTipCard(),
+            _dailyTipCard(
+              cardColor: cardColor,
+              textColor: textColor,
+              subTextColor: subTextColor,
+              shadowColor: shadowColor,
+            ),
             const SizedBox(height: 24),
           ],
         ),
@@ -104,8 +145,12 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final bgColor = isDarkMode ? const Color(0xFF121212) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: bgColor,
       appBar: AppBar(
         title: Text(
           _currentIndex == 0
@@ -113,17 +158,20 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
               : _currentIndex == 1
                   ? 'Stress Modules'
                   : 'Progress Tracking',
-          style: const TextStyle(color: Colors.black),
+          style: TextStyle(color: textColor),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: bgColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        surfaceTintColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
+        surfaceTintColor: bgColor,
+        iconTheme: IconThemeData(color: textColor),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.help_outline, color: Colors.black54),
+            icon: Icon(Icons.help_outline,
+                color: isDarkMode
+                    ? const Color(0xFFB0B0B0)
+                    : const Color(0xFF757575)),
             onPressed: () {},
           ),
         ],
@@ -163,6 +211,10 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
     required String title,
     required String description,
     required VoidCallback onTap,
+    required Color cardColor,
+    required Color textColor,
+    required Color subTextColor,
+    required Color shadowColor,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -170,11 +222,11 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
         width: double.infinity,
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cardColor,
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.08),
+              color: shadowColor,
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -196,12 +248,13 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16)),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: textColor)),
                   const SizedBox(height: 2),
                   Text(description,
-                      style:
-                          const TextStyle(fontSize: 13, color: Colors.black54)),
+                      style: TextStyle(fontSize: 13, color: subTextColor)),
                 ],
               ),
             ),
@@ -216,18 +269,22 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
     required Color iconColor,
     required String title,
     required String subtitle,
+    required Color cardColor,
+    required Color textColor,
+    required Color subTextColor,
+    required Color shadowColor,
   }) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.07),
+            color: shadowColor,
             blurRadius: 8,
-            offset: const Offset(0, 3),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -235,47 +292,72 @@ class _StressMonitoringScreenState extends State<StressMonitoringScreen> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.13),
-              borderRadius: BorderRadius.circular(10),
+              color: iconColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.all(8),
-            child: Icon(icon, color: iconColor, size: 22),
+            child: Icon(icon, color: iconColor, size: 24),
           ),
           const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w600, fontSize: 14)),
-              const SizedBox(height: 2),
-              Text(subtitle,
-                  style: const TextStyle(fontSize: 12, color: Colors.black54)),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: textColor)),
+                const SizedBox(height: 2),
+                Text(subtitle,
+                    style: TextStyle(fontSize: 13, color: subTextColor)),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _dailyTipCard() {
+  Widget _dailyTipCard({
+    required Color cardColor,
+    required Color textColor,
+    required Color subTextColor,
+    required Color shadowColor,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: const Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.lightbulb, color: Color(0xFF7B61FF), size: 22),
-          SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              'Daily Tip\n"Take short breaks throughout your day to practice deep breathing. Even 2 minutes can make a difference."',
-              style: TextStyle(fontSize: 13, color: Color(0xFF5B5B5B)),
-            ),
+          Row(
+            children: [
+              Icon(Icons.lightbulb_outline,
+                  color: const Color(0xFF7B61FF), size: 24),
+              const SizedBox(width: 8),
+              Text('Daily Tip',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: textColor)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Take a 5-minute break every hour to stretch and breathe deeply. This helps reduce stress and improve focus.',
+            style: TextStyle(fontSize: 14, color: subTextColor),
           ),
         ],
       ),
@@ -512,24 +594,5 @@ class CurveNavBarPainter extends CustomPainter {
   bool shouldRepaint(covariant CurveNavBarPainter oldDelegate) {
     return position != oldDelegate.position ||
         backgroundColor != oldDelegate.backgroundColor;
-  }
-}
-
-class SurveyScreen extends StatelessWidget {
-  const SurveyScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Stress Survey'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-      ),
-      body: const Center(
-        child: Text('Survey goes here', style: TextStyle(fontSize: 20)),
-      ),
-    );
   }
 }

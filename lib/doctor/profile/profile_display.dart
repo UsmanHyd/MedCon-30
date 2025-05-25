@@ -5,6 +5,8 @@ import 'edit_profile.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../modules/doctor_dashboard.dart';
+import 'dart:ui';
+import '../../services/cloudinary_service.dart';
 
 class DoctorProfileDisplayScreen extends StatefulWidget {
   const DoctorProfileDisplayScreen({super.key});
@@ -20,6 +22,12 @@ class _DoctorProfileDisplayScreenState
   Map<String, dynamic>? _profileData;
   File? _profileImage;
   final ImagePicker _picker = ImagePicker();
+  double _coverImageOffset = 0.0;
+  double _maxCoverDrag = 100.0; // max pixels to drag down
+  bool _showFullscreenCover = false;
+  double _dragStartY = 0.0;
+  double _fullscreenDragStartY = 0.0;
+  double _fullscreenDragDelta = 0.0;
 
   @override
   void initState() {
@@ -66,6 +74,91 @@ class _DoctorProfileDisplayScreenState
     } catch (_) {
       return null;
     }
+  }
+
+  String _calculateExperienceDuration(String start, String end) {
+    if (start.isEmpty) return '';
+    try {
+      // Accepts formats like 'Jan 2020', '2020', '01/2020', etc.
+      DateTime parseDate(String s) {
+        final parts = s.split('/');
+        if (parts.length == 2) {
+          // MM/YYYY
+          return DateTime(int.parse(parts[1]), int.parse(parts[0]));
+        } else if (parts.length == 3) {
+          // DD/MM/YYYY
+          return DateTime(
+              int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+        } else if (s.contains('-')) {
+          // YYYY-MM
+          final p = s.split('-');
+          return DateTime(int.parse(p[0]), int.parse(p[1]));
+        } else if (s.length == 4) {
+          // YYYY
+          return DateTime(int.parse(s));
+        } else {
+          // Try parsing directly
+          return DateTime.parse(s);
+        }
+      }
+
+      final startDate = parseDate(start);
+      final endDate = (end.isEmpty) ? DateTime.now() : parseDate(end);
+      int years = endDate.year - startDate.year;
+      int months = endDate.month - startDate.month;
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+      String y = years > 0 ? '$years year${years > 1 ? 's' : ''}' : '';
+      String m = months > 0 ? '$months month${months > 1 ? 's' : ''}' : '';
+      if (y.isNotEmpty && m.isNotEmpty) return '($y, $m)';
+      if (y.isNotEmpty) return '($y)';
+      if (m.isNotEmpty) return '($m)';
+      return '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  int _calculateTotalExperienceYears(List experiences) {
+    int totalMonths = 0;
+    for (final e in experiences) {
+      final start = e['startDate'] ?? '';
+      final end = e['endDate'] ?? '';
+      if (start.isEmpty) continue;
+      try {
+        DateTime parseDate(String s) {
+          final parts = s.split('/');
+          if (parts.length == 2) {
+            // MM/YYYY
+            return DateTime(int.parse(parts[1]), int.parse(parts[0]));
+          } else if (parts.length == 3) {
+            // DD/MM/YYYY
+            return DateTime(
+                int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+          } else if (s.contains('-')) {
+            // YYYY-MM
+            final p = s.split('-');
+            return DateTime(int.parse(p[0]), int.parse(p[1]));
+          } else if (s.length == 4) {
+            // YYYY
+            return DateTime(int.parse(s));
+          } else {
+            // Try parsing directly
+            return DateTime.parse(s);
+          }
+        }
+
+        final startDate = parseDate(start);
+        final endDate = (end.isEmpty) ? DateTime.now() : parseDate(end);
+        int months = (endDate.year - startDate.year) * 12 +
+            (endDate.month - startDate.month);
+        if (endDate.day < startDate.day) months--;
+        if (months > 0) totalMonths += months;
+      } catch (_) {}
+    }
+    return totalMonths;
   }
 
   Widget _buildSectionHeader(String title) {
@@ -128,18 +221,58 @@ class _DoctorProfileDisplayScreenState
     );
   }
 
-  Future<void> _pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _profileImage = File(image.path);
-      });
+  Future<void> _pickAndConfirmImage() async {
+    final picker = ImagePicker();
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (pickedFile != null) {
+      final tempImage = File(pickedFile.path);
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Confirm Profile Picture'),
+          content:
+              Image.file(tempImage, width: 120, height: 120, fit: BoxFit.cover),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Yes, Save'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed == true) {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          final url = await CloudinaryService.uploadImage(tempImage);
+          if (url != null) {
+            await FirebaseFirestore.instance
+                .collection('doctors')
+                .doc(user.uid)
+                .update({'profilePic': url});
+            setState(() {
+              _profileImage = null;
+              if (_profileData != null) {
+                _profileData!['profilePic'] = url;
+              }
+            });
+          }
+        }
+      }
     }
   }
 
   void _showProfilePictureOptions() {
-    if (_profileImage == null) {
-      _pickImage();
+    final profileImageUrl = _profileImage != null
+        ? _profileImage!.path
+        : (_profileData!['profilePic'] ?? null);
+    if (_profileImage == null &&
+        (profileImageUrl == null || profileImageUrl.isEmpty)) {
+      _pickAndConfirmImage();
       return;
     }
     showModalBottomSheet(
@@ -165,7 +298,12 @@ class _DoctorProfileDisplayScreenState
                         onTap: () => Navigator.pop(context),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16),
-                          child: Image.file(_profileImage!),
+                          child: _profileImage != null
+                              ? Image.file(_profileImage!)
+                              : (profileImageUrl != null &&
+                                      profileImageUrl.isNotEmpty)
+                                  ? Image.network(profileImageUrl)
+                                  : const SizedBox.shrink(),
                         ),
                       ),
                     ),
@@ -176,10 +314,20 @@ class _DoctorProfileDisplayScreenState
                 leading: const Icon(Icons.delete, color: Colors.red),
                 title: const Text('Delete Profile Picture',
                     style: TextStyle(color: Colors.red)),
-                onTap: () {
+                onTap: () async {
                   setState(() {
                     _profileImage = null;
+                    if (_profileData != null) {
+                      _profileData!['profilePic'] = null;
+                    }
                   });
+                  final user = FirebaseAuth.instance.currentUser;
+                  if (user != null) {
+                    await FirebaseFirestore.instance
+                        .collection('doctors')
+                        .doc(user.uid)
+                        .update({'profilePic': FieldValue.delete()});
+                  }
                   Navigator.pop(context);
                 },
               ),
@@ -188,7 +336,7 @@ class _DoctorProfileDisplayScreenState
                 title: const Text('Add New Picture'),
                 onTap: () {
                   Navigator.pop(context);
-                  _pickImage();
+                  _pickAndConfirmImage();
                 },
               ),
             ],
@@ -271,285 +419,621 @@ class _DoctorProfileDisplayScreenState
       _profileData!['experience'] = <Map<String, dynamic>>[];
     }
     final age = _calculateAge(_profileData!['dateOfBirth'] ?? '');
+    final profileImageUrl = _profileImage != null
+        ? _profileImage!.path
+        : (_profileData!['profilePic'] ?? null);
+    final experienceList = _profileData!["experience"] as List;
+    final totalExperienceMonths = experienceList.isNotEmpty
+        ? _calculateTotalExperienceYears(experienceList)
+        : null;
+    final totalExperienceYearsDisplay =
+        (totalExperienceMonths != null && totalExperienceMonths > 0)
+            ? ((totalExperienceMonths ~/ 12) > 0
+                ? '${totalExperienceMonths ~/ 12}+'
+                : '1+')
+            : (_profileData!["yearsExperience"]?.toString() ?? "-");
+
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _buildProfileImage(),
-            const SizedBox(height: 24),
-            // Personal Information Card
-            _buildCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionHeader('Personal Information'),
-                  _buildInfoRow(
-                    label: 'Name',
-                    value: _profileData!['name'] ?? 'Not provided',
-                  ),
-                  _buildInfoRow(
-                    label: 'Email',
-                    value: _profileData!['email'] ?? 'Not provided',
-                  ),
-                  _buildInfoRow(
-                    label: 'Phone Number',
-                    value: _profileData!['phoneNumber'] ?? 'Not provided',
-                  ),
-                  _buildInfoRow(
-                    label: 'Date of Birth',
-                    value: _profileData!['dateOfBirth'] ?? 'Not provided',
-                  ),
-                  if (age != null)
-                    _buildInfoRow(
-                      label: 'Age',
-                      value: age.toString(),
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF121212)
+          : const Color(0xFFE3F2FD),
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: GestureDetector(
+                  onVerticalDragStart: (details) {
+                    _dragStartY = details.localPosition.dy;
+                  },
+                  onVerticalDragUpdate: (details) {
+                    final dragDistance = details.localPosition.dy - _dragStartY;
+                    if (dragDistance > 80 && !_showFullscreenCover) {
+                      setState(() {
+                        _showFullscreenCover = true;
+                      });
+                    }
+                  },
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(32),
+                      bottomRight: Radius.circular(32),
                     ),
-                  _buildInfoRow(
-                    label: 'Gender',
-                    value: _profileData!['gender'] ?? 'Not provided',
-                  ),
-                ],
-              ),
-            ),
-            // Doctor Description Card
-            _buildCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionHeader('Doctor Description'),
-                  Text(
-                    _profileData!['description'] != null &&
-                            (_profileData!['description'] as String)
-                                .trim()
-                                .isNotEmpty
-                        ? _profileData!['description']
-                        : 'Not provided',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ],
-              ),
-            ),
-            // Professional Information Card with 3 sub-boxes
-            _buildCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionHeader('Professional Information'),
-                  // License & Specializations sub-box
-                  Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.black.withOpacity(0.12)
-                              : Colors.black.withOpacity(0.03),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('License & Specializations',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall
-                                ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF0288D1))),
-                        const SizedBox(height: 8),
-                        _buildInfoRow(
-                          label: 'License Number',
-                          value:
-                              _profileData!['licenseNumber'] ?? 'Not provided',
-                        ),
-                        _buildInfoRow(
-                          label: 'Specializations',
-                          value: (_profileData!['specializations'] is List &&
-                                  (_profileData!['specializations'] as List)
-                                      .isNotEmpty)
-                              ? (_profileData!['specializations'] as List)
-                                  .join(', ')
-                              : 'Not provided',
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Education sub-box
-                  Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.black.withOpacity(0.12)
-                              : Colors.black.withOpacity(0.03),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Education',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall
-                                ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF0288D1))),
-                        const SizedBox(height: 8),
-                        if ((_profileData!['education'] as List).isEmpty)
-                          _buildInfoRow(label: '', value: 'Not provided'),
-                        ...(_profileData!['education'] as List)
-                            .map<Widget>((e) {
-                          final degree = e['degree'] ?? '';
-                          final institute = e['institute'] ?? '';
-                          final start = e['startDate'] ?? '';
-                          final end = e['endDate'] ?? '';
-                          final tenure = (start.isNotEmpty && end.isNotEmpty)
-                              ? '$start - $end'
-                              : '';
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  degree.isNotEmpty ? degree : 'Degree',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16),
-                                ),
-                                if (institute.isNotEmpty)
-                                  Text(institute,
-                                      style: const TextStyle(fontSize: 15)),
-                                if (tenure.isNotEmpty)
-                                  Text(tenure,
-                                      style: const TextStyle(
-                                          fontSize: 14, color: Colors.grey)),
-                              ],
+                    child: Container(
+                      height: 260,
+                      width: double.infinity,
+                      color: Colors.blue[50],
+                      child: (profileImageUrl != null &&
+                              profileImageUrl.isNotEmpty)
+                          ? Image(
+                              image: _profileImage != null
+                                  ? FileImage(_profileImage!)
+                                  : NetworkImage(profileImageUrl)
+                                      as ImageProvider,
+                              fit: BoxFit.cover,
+                              alignment: const Alignment(0, -0.3),
+                            )
+                          : Center(
+                              child: Icon(
+                                Icons.account_circle,
+                                size: 120,
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white24
+                                    : Colors.blue[100],
+                              ),
                             ),
-                          );
-                        }).toList(),
-                      ],
                     ),
                   ),
-                  // Experience sub-box
-                  Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(bottom: 0),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.black.withOpacity(0.12)
-                              : Colors.black.withOpacity(0.03),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Experience',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall
-                                ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF0288D1))),
-                        const SizedBox(height: 8),
-                        if ((_profileData!['experience'] as List).isEmpty)
-                          _buildInfoRow(label: '', value: 'Not provided'),
-                        ...(_profileData!['experience'] as List)
-                            .map<Widget>((e) {
-                          final role = e['role'] ?? '';
-                          final location = e['location'] ?? '';
-                          final start = e['startDate'] ?? '';
-                          final end = e['endDate'] ?? '';
-                          final tenure = (start.isNotEmpty && end.isNotEmpty)
-                              ? '$start - $end'
-                              : '';
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  role.isNotEmpty ? role : 'Role',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16),
-                                ),
-                                if (location.isNotEmpty)
-                                  Text(location,
-                                      style: const TextStyle(fontSize: 15)),
-                                if (tenure.isNotEmpty)
-                                  Text(tenure,
-                                      style: const TextStyle(
-                                          fontSize: 14, color: Colors.grey)),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DoctorEditProfileScreen(
-                      profileData: _profileData!,
-                    ),
-                  ),
-                ).then((_) => _loadProfileData());
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 2,
-                minimumSize: const Size(double.infinity, 50),
-              ),
-              child: const Text(
-                'Edit Profile',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  const SizedBox(height: 16),
+                  // Main info card (profile picture + name, specialization, rating, stats)
+                  Card(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF23272F)
+                        : Colors.white,
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    elevation: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              GestureDetector(
+                                onTap: _showProfilePictureOptions,
+                                child: CircleAvatar(
+                                  radius: 36,
+                                  backgroundColor: Colors.white,
+                                  backgroundImage: profileImageUrl != null
+                                      ? (_profileImage != null
+                                              ? FileImage(_profileImage!)
+                                              : NetworkImage(profileImageUrl))
+                                          as ImageProvider
+                                      : null,
+                                  child: profileImageUrl == null
+                                      ? const Icon(Icons.account_circle,
+                                          size: 48, color: Color(0xFF0288D1))
+                                      : null,
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Dr. ' +
+                                          (_profileData!['name'] ??
+                                              'Doctor Name'),
+                                      style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.lightBlue[200]
+                                              : const Color(0xFF2196F3)),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      _profileData!['specializations']
+                                                  is List &&
+                                              (_profileData!['specializations']
+                                                      as List)
+                                                  .isNotEmpty
+                                          ? (_profileData!['specializations']
+                                                  as List)
+                                              .join(', ')
+                                          : 'General Physician',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.lightBlue[100]
+                                              : Colors.black54),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.star,
+                                            color: Color(0xFFFFC107), size: 20),
+                                        const SizedBox(width: 4),
+                                        Text('4.8',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                                color: Theme.of(context)
+                                                            .brightness ==
+                                                        Brightness.dark
+                                                    ? Colors.white
+                                                    : Colors.black)),
+                                        const SizedBox(width: 4),
+                                        Text('(10 reviews)',
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                color: Theme.of(context)
+                                                            .brightness ==
+                                                        Brightness.dark
+                                                    ? Colors.lightBlue[100]
+                                                    : Colors.black54)),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 18),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _StatColumn(
+                                  label: "Years Exp.",
+                                  value: totalExperienceYearsDisplay),
+                              _StatColumn(label: "Patients", value: '10+'),
+                              _StatColumn(label: "Satisfaction", value: '98%'),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Personal Information Card (new)
+                  Card(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF23272F)
+                        : Colors.white,
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Personal Information',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.lightBlue[200]
+                                      : const Color(0xFF2196F3))),
+                          const SizedBox(height: 10),
+                          _InfoRow(
+                              label: 'Email',
+                              value: _profileData!['email'] ?? 'Not provided'),
+                          _InfoRow(
+                              label: 'Phone',
+                              value: _profileData!['phoneNumber'] ??
+                                  'Not provided'),
+                          _InfoRow(
+                              label: 'Date of Birth',
+                              value: _profileData!['dateOfBirth'] ??
+                                  'Not provided'),
+                          if (age != null)
+                            _InfoRow(label: 'Age', value: age.toString()),
+                          _InfoRow(
+                              label: 'Gender',
+                              value: _profileData!['gender'] ?? 'Not provided'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // About section
+                  _SectionTitle(title: "About"),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Card(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF23272F)
+                          : Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      elevation: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          _profileData!["description"] != null &&
+                                  (_profileData!["description"] as String)
+                                      .trim()
+                                      .isNotEmpty
+                              ? _profileData!["description"]
+                              : "No description provided.",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Qualifications section
+                  _SectionTitle(title: "Qualifications"),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Card(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF23272F)
+                          : Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      elevation: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Education sub-box
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0xFF23272F)
+                                    : Colors.blueGrey[50],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Education",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.lightBlue[200]
+                                              : const Color(0xFF2196F3))),
+                                  ...(_profileData!["education"] as List)
+                                          .isEmpty
+                                      ? [const Text("No education provided.")]
+                                      : (_profileData!["education"] as List)
+                                          .map<Widget>((e) {
+                                          final degree = e['degree'] ?? '';
+                                          final institute =
+                                              e['institute'] ?? '';
+                                          final start = e['startDate'] ?? '';
+                                          final end = e['endDate'] ?? '';
+                                          final tenure = (start.isNotEmpty &&
+                                                  end.isNotEmpty)
+                                              ? '$start - $end'
+                                              : '';
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 8.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                    degree.isNotEmpty
+                                                        ? degree
+                                                        : 'Degree',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16,
+                                                        color: Theme.of(context)
+                                                                    .brightness ==
+                                                                Brightness.dark
+                                                            ? Colors.white
+                                                            : Colors.black)),
+                                                if (institute.isNotEmpty)
+                                                  Text(institute,
+                                                      style: TextStyle(
+                                                          fontSize: 15,
+                                                          color: Theme.of(context)
+                                                                      .brightness ==
+                                                                  Brightness
+                                                                      .dark
+                                                              ? Colors.white70
+                                                              : Colors
+                                                                  .black87)),
+                                                if (tenure.isNotEmpty)
+                                                  Text(tenure,
+                                                      style: TextStyle(
+                                                          fontSize: 14,
+                                                          color: Theme.of(context)
+                                                                      .brightness ==
+                                                                  Brightness
+                                                                      .dark
+                                                              ? Colors
+                                                                  .lightBlue[100]
+                                                              : Colors.grey)),
+                                              ],
+                                            ),
+                                          );
+                                        }).toList(),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            // Experience sub-box
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? const Color(0xFF23272F)
+                                    : Colors.blueGrey[50],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Experiences",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.lightBlue[200]
+                                              : const Color(0xFF2196F3))),
+                                  ...(_profileData!["experience"] as List)
+                                          .isEmpty
+                                      ? [const Text("No experience provided.")]
+                                      : (_profileData!["experience"] as List)
+                                          .map<Widget>((e) {
+                                          final role = e['role'] ?? '';
+                                          final location = e['location'] ?? '';
+                                          final start = e['startDate'] ?? '';
+                                          final end = e['endDate'] ?? '';
+                                          final tenure = (start.isNotEmpty &&
+                                                  end.isNotEmpty)
+                                              ? '$start - $end'
+                                              : (start.isNotEmpty
+                                                  ? '$start - Present'
+                                                  : '');
+                                          final duration =
+                                              _calculateExperienceDuration(
+                                                  start, end);
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 8.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                    role.isNotEmpty
+                                                        ? role
+                                                        : 'Role',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16,
+                                                        color: Theme.of(context)
+                                                                    .brightness ==
+                                                                Brightness.dark
+                                                            ? Colors.white
+                                                            : Colors.black)),
+                                                if (location.isNotEmpty)
+                                                  Text(location,
+                                                      style: TextStyle(
+                                                          fontSize: 15,
+                                                          color: Theme.of(context)
+                                                                      .brightness ==
+                                                                  Brightness
+                                                                      .dark
+                                                              ? Colors.white70
+                                                              : Colors
+                                                                  .black87)),
+                                                if (tenure.isNotEmpty)
+                                                  Text(
+                                                      '$tenure ${duration.isNotEmpty ? duration : ''}',
+                                                      style: TextStyle(
+                                                          fontSize: 14,
+                                                          color: Theme.of(context)
+                                                                      .brightness ==
+                                                                  Brightness
+                                                                      .dark
+                                                              ? Colors
+                                                                  .lightBlue[100]
+                                                              : Colors.grey)),
+                                              ],
+                                            ),
+                                          );
+                                        }).toList(),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DoctorEditProfileScreen(
+                            profileData: _profileData!,
+                          ),
+                        ),
+                      ).then((_) => _loadProfileData());
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
+                    child: const Text(
+                      'Edit Profile',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 100),
+                ]),
+              ),
+            ],
+          ),
+          // Fullscreen cover image overlay
+          if (_showFullscreenCover && profileImageUrl != null)
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: GestureDetector(
+                onVerticalDragStart: (details) {
+                  _fullscreenDragStartY = details.localPosition.dy;
+                  _fullscreenDragDelta = 0.0;
+                },
+                onVerticalDragUpdate: (details) {
+                  _fullscreenDragDelta =
+                      details.localPosition.dy - _fullscreenDragStartY;
+                },
+                onVerticalDragEnd: (_) {
+                  if (_fullscreenDragDelta < -60) {
+                    // Dragged up
+                    setState(() {
+                      _showFullscreenCover = false;
+                    });
+                  }
+                },
+                child: Container(
+                  color: Colors.black,
+                  child: Stack(
+                    children: [
+                      InteractiveViewer(
+                        minScale: 0.5,
+                        maxScale: 4,
+                        child: Center(
+                          child: Image(
+                            image: _profileImage != null
+                                ? FileImage(_profileImage!)
+                                : NetworkImage(profileImageUrl)
+                                    as ImageProvider,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 24,
+                        right: 24,
+                        child: GestureDetector(
+                          onTap: () =>
+                              setState(() => _showFullscreenCover = false),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              shape: BoxShape.circle,
+                            ),
+                            padding: const EdgeInsets.all(8),
+                            child: const Icon(Icons.close,
+                                color: Colors.white, size: 28),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(height: 100),
-          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _StatColumn extends StatelessWidget {
+  final String label;
+  final String value;
+  const _StatColumn({required this.label, required this.value});
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(value,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+      ],
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String title;
+  const _SectionTitle({required this.title});
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: isDark ? Colors.lightBlue[200] : const Color(0xFF2196F3),
         ),
+      ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+  const _InfoRow({required this.label, required this.value});
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final labelColor = isDark ? Colors.lightBlue[100] : Colors.black87;
+    final valueColor = isDark ? Colors.white : Colors.black;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      child: Row(
+        children: [
+          Text('$label:',
+              style: TextStyle(fontWeight: FontWeight.w600, color: labelColor)),
+          const SizedBox(width: 8),
+          Expanded(child: Text(value, style: TextStyle(color: valueColor))),
+        ],
       ),
     );
   }

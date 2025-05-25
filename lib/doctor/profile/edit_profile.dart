@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../modules/doctor_dashboard.dart';
 import 'profile_display.dart';
+import '../../services/cloudinary_service.dart';
 
 class DoctorEditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> profileData;
@@ -23,6 +24,7 @@ class _DoctorEditProfileScreenState extends State<DoctorEditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   File? _profileImage;
+  String? _profileImageUrl;
   final ImagePicker _picker = ImagePicker();
 
   // Controllers
@@ -62,6 +64,7 @@ class _DoctorEditProfileScreenState extends State<DoctorEditProfileScreen> {
   void initState() {
     super.initState();
     _initializeControllers();
+    _profileImageUrl = widget.profileData['profilePic'] as String?;
   }
 
   void _initializeControllers() {
@@ -99,10 +102,12 @@ class _DoctorEditProfileScreenState extends State<DoctorEditProfileScreen> {
   }
 
   Future<void> _pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
+    final picker = ImagePicker();
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (pickedFile != null) {
       setState(() {
-        _profileImage = File(image.path);
+        _profileImage = File(pickedFile.path);
       });
     }
   }
@@ -132,6 +137,12 @@ class _DoctorEditProfileScreenState extends State<DoctorEditProfileScreen> {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception('User not authenticated');
 
+      String? imageUrl = _profileImageUrl;
+      if (_profileImage != null) {
+        imageUrl = await CloudinaryService.uploadImage(_profileImage!);
+        if (imageUrl == null) throw Exception('Image upload failed');
+      }
+
       final profileData = {
         'name': _nameController.text.trim(),
         'email': _emailController.text.trim(),
@@ -142,6 +153,7 @@ class _DoctorEditProfileScreenState extends State<DoctorEditProfileScreen> {
         'dateOfBirth': _dobController.text.trim(),
         'gender': _selectedGender,
         'experience': _experienceList,
+        'profilePic': imageUrl,
         'updatedAt': FieldValue.serverTimestamp(),
       };
 
@@ -155,12 +167,7 @@ class _DoctorEditProfileScreenState extends State<DoctorEditProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile updated successfully!')),
         );
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const DoctorProfileDisplayScreen()),
-          (route) => false,
-        );
+        Navigator.pop(context, true);
       }
     } catch (e) {
       if (mounted) {
@@ -423,57 +430,38 @@ class _DoctorEditProfileScreenState extends State<DoctorEditProfileScreen> {
   }
 
   Widget _buildProfileImage() {
-    return GestureDetector(
-      onTap: _pickImage,
-      child: Container(
-        width: 120,
-        height: 120,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Theme.of(context).cardColor
-              : Colors.white,
-          border: Border.all(
-            color: Theme.of(context).iconTheme.color!,
-            width: 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).shadowColor.withOpacity(0.2),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
+    return Stack(
+      children: [
+        CircleAvatar(
+          radius: 50,
+          backgroundImage: _profileImage != null
+              ? FileImage(_profileImage!)
+              : (_profileImageUrl != null && _profileImageUrl!.isNotEmpty)
+                  ? NetworkImage(_profileImageUrl!) as ImageProvider
+                  : const AssetImage('assets/default_avatar.png'),
         ),
-        child: _profileImage != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(60),
-                child: Image.file(
-                  _profileImage!,
-                  width: 120,
-                  height: 120,
-                  fit: BoxFit.cover,
-                ),
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.add_a_photo,
-                    size: 40,
-                    color: Theme.of(context).iconTheme.color,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Add Photo',
-                    style: TextStyle(
-                      color: Theme.of(context).iconTheme.color,
-                      fontSize: 12,
-                    ),
+        Positioned(
+          bottom: 0,
+          right: 0,
+          child: InkWell(
+            onTap: _pickImage,
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 4,
                   ),
                 ],
               ),
-      ),
+              child: const Icon(Icons.camera_alt, color: Color(0xFF0288D1)),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

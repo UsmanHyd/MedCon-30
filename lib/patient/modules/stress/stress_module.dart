@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:medcon30/theme/theme_provider.dart';
 
 class StressModulesScreen extends StatefulWidget {
   const StressModulesScreen({super.key});
@@ -13,112 +15,198 @@ class _StressModulesScreenState extends State<StressModulesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final bgColor =
+        isDarkMode ? const Color(0xFF121212) : const Color(0xFFE0F7FA);
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor =
+        isDarkMode ? const Color(0xFFB0B0B0) : const Color(0xFF757575);
+    final shadowColor = isDarkMode
+        ? Colors.black.withOpacity(0.2)
+        : Colors.grey.withOpacity(0.08);
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildFilterChips(),
+            _buildFilterChips(isDarkMode),
             const SizedBox(height: 10),
-            _buildSearchBar(),
+            _buildSearchBar(isDarkMode),
             const SizedBox(height: 18),
-            _sectionTitle('Breathing Exercises'),
+            _sectionTitle('Breathing Exercises', textColor),
             _moduleGrid([
               _moduleCard(
                   'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=500&q=80',
                   'Deep Breathing',
                   'Slow, deep breaths to calm your nervous system',
-                  0.75),
+                  0.75,
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  shadowColor: shadowColor),
               _moduleCard(
                   'https://d3srkhfokg8sj0.cloudfront.net/wp-content/uploads/sites/669/featured-5-anxiety-696x313.jpg',
                   'Box Breathing',
                   'Equal inhale, hold, exhale pattern',
-                  0.3),
+                  0.3,
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  shadowColor: shadowColor),
               _moduleCard(
                   'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=500&q=80',
                   '4-7-8 Technique',
                   'Timed breathing for relaxation',
                   null,
-                  isNew: true),
+                  isNew: true,
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  shadowColor: shadowColor),
             ]),
             const SizedBox(height: 18),
-            _sectionTitle('Meditation'),
+            _sectionTitle('Meditation', textColor),
             _moduleGrid([
               _moduleCard(
                   'https://images.unsplash.com/photo-1508672019048-805c876b67e2?w=500&q=80',
                   'Guided Meditation',
                   'Voice-guided relaxation sessions',
-                  0.5),
+                  0.5,
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  shadowColor: shadowColor),
               _moduleCard(
                   'https://images.unsplash.com/photo-1512438248247-f0f2a5a8b7f0?w=500&q=80',
                   'Mindfulness',
                   'Present-moment awareness practice',
-                  0.25),
+                  0.25,
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  shadowColor: shadowColor),
               _moduleCard(
                   'https://overcomingms.org/wp-content/uploads/2022/05/Meditation-videos.png',
                   'Body Scan',
                   'Systematic relaxation technique',
                   null,
-                  isNew: true),
+                  isNew: true,
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  shadowColor: shadowColor),
             ]),
             const SizedBox(height: 18),
-            _sectionTitle('Physical Activities'),
+            _sectionTitle('Physical Activities', textColor),
             _moduleGrid([
               _moduleCard(
                   'https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?w=500&q=80',
                   'Stretching',
                   'Gentle stretches for tension relief',
-                  0.6),
+                  0.6,
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  shadowColor: shadowColor),
               _moduleCard(
                   'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=500&q=80',
                   'Muscle Relaxation',
                   'Tense and release muscle groups',
-                  0.4),
+                  0.4,
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  shadowColor: shadowColor),
               _moduleCard(
                   'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&q=80',
                   'Quick Exercises',
                   'Short activities for busy days',
-                  0.15),
+                  0.15,
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  shadowColor: shadowColor),
             ]),
             const SizedBox(height: 18),
-            _sectionTitle('Sleep Improvement'),
+            _sectionTitle('Sleep Improvement', textColor),
             _moduleGrid([
               _moduleCard(
                   'https://assets.clevelandclinic.org/transform/LargeFeatureImage/92ea470e-f918-4e3f-8ca0-bd57663497e7/cihld-sleep-school-1090567386-770x533-1_jpg',
                   'Bedtime Routine',
                   'Establish healthy sleep habits',
-                  0.2),
+                  0.2,
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  shadowColor: shadowColor),
               _moduleCard(
                   'https://www.artofliving.org/sites/www.artofliving.org/files/styles/original_image/public/wysiwyg_imageupload/1-MeditationForSleep.jpg.webp?itok=RI2y_KFp',
                   'Sleep Meditation',
                   'Guided relaxation for better sleep',
                   null,
-                  isNew: true),
+                  isNew: true,
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  shadowColor: shadowColor),
               _moduleCard(
                   'https://www.happiesthealth.com/wp-content/uploads/2022/12/Relaxation-techniques.jpg',
                   'Relaxation Techniques',
                   'Methods to calm mind before sleep',
-                  0.35),
+                  0.35,
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  shadowColor: shadowColor),
             ]),
             const SizedBox(height: 18),
-            _sectionTitle('Stress Education'),
+            _sectionTitle('Stress Education', textColor),
             _moduleGrid([
               _moduleCard(
                   'https://iimtu.edu.in/blog/wp-content/uploads/2023/11/Stress-1-1.png',
                   'Understanding Stress',
                   'Learn how stress affects your body',
-                  0.8),
+                  0.8,
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  shadowColor: shadowColor),
               _moduleCard(
                   'https://blog.mdi-training.com/wp-content/uploads/2020/11/shutterstock_632448815.png',
                   'Coping Strategies',
                   'Effective ways to handle stress',
-                  0.45),
+                  0.45,
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  shadowColor: shadowColor),
               _moduleCard(
                   'https://static.twentyoverten.com/5cf91870d904cf2044d861a6/ej8sMMog71c/work-stress.jpg',
                   'Stress Triggers',
                   'Identify your personal stressors',
-                  0.1),
+                  0.1,
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  shadowColor: shadowColor),
             ]),
             const SizedBox(height: 24),
           ],
@@ -127,7 +215,7 @@ class _StressModulesScreenState extends State<StressModulesScreen> {
     );
   }
 
-  Widget _buildFilterChips() {
+  Widget _buildFilterChips(bool isDarkMode) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -142,9 +230,13 @@ class _StressModulesScreenState extends State<StressModulesScreen> {
                 setState(() => _selectedFilter = index);
               },
               selectedColor: const Color(0xFF7B61FF),
-              backgroundColor: const Color(0xFFF3F1FF),
+              backgroundColor: isDarkMode
+                  ? const Color(0xFF2C2C2C)
+                  : const Color(0xFFF3F1FF),
               labelStyle: TextStyle(
-                color: selected ? Colors.white : Colors.black,
+                color: selected
+                    ? Colors.white
+                    : (isDarkMode ? Colors.white : Colors.black),
                 fontWeight: FontWeight.w600,
               ),
               shape: RoundedRectangleBorder(
@@ -157,13 +249,16 @@ class _StressModulesScreenState extends State<StressModulesScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(bool isDarkMode) {
     return TextField(
       decoration: InputDecoration(
         hintText: 'Search modules',
+        hintStyle: TextStyle(
+            color:
+                isDarkMode ? const Color(0xFFB0B0B0) : const Color(0xFF757575)),
         prefixIcon: const Icon(Icons.search, color: Color(0xFF7B61FF)),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: isDarkMode ? const Color(0xFF2C2C2C) : Colors.white,
         contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -173,12 +268,13 @@ class _StressModulesScreenState extends State<StressModulesScreen> {
     );
   }
 
-  Widget _sectionTitle(String title) {
+  Widget _sectionTitle(String title, Color textColor) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(
         title,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        style: TextStyle(
+            fontWeight: FontWeight.bold, fontSize: 16, color: textColor),
       ),
     );
   }
@@ -191,8 +287,7 @@ class _StressModulesScreenState extends State<StressModulesScreen> {
           runSpacing: 12,
           children: cards
               .map((card) => SizedBox(
-                    width: (constraints.maxWidth - 12) /
-                        2, // 2 cards per row with spacing
+                    width: (constraints.maxWidth - 12) / 2,
                     child: card,
                   ))
               .toList(),
@@ -202,21 +297,30 @@ class _StressModulesScreenState extends State<StressModulesScreen> {
   }
 
   Widget _moduleCard(
-      String imagePath, String title, String subtitle, double? progress,
-      {bool isNew = false}) {
+    String imagePath,
+    String title,
+    String subtitle,
+    double? progress, {
+    bool isNew = false,
+    required bool isDarkMode,
+    required Color cardColor,
+    required Color textColor,
+    required Color subTextColor,
+    required Color shadowColor,
+  }) {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => Scaffold(
-              backgroundColor: Colors.white,
+              backgroundColor: cardColor,
               appBar: AppBar(
-                title: Text(title),
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
+                title: Text(title, style: TextStyle(color: textColor)),
+                backgroundColor: cardColor,
+                foregroundColor: textColor,
                 elevation: 0,
                 scrolledUnderElevation: 0,
-                surfaceTintColor: Colors.white,
+                surfaceTintColor: cardColor,
               ),
               body: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
@@ -230,12 +334,55 @@ class _StressModulesScreenState extends State<StressModulesScreen> {
                         width: double.infinity,
                         height: 200,
                         fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            width: double.infinity,
+                            height: 200,
+                            color: isDarkMode
+                                ? const Color(0xFF2C2C2C)
+                                : Colors.grey[200],
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                                color: const Color(0xFF7B61FF),
+                              ),
+                            ),
+                          );
+                        },
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             width: double.infinity,
                             height: 200,
-                            color: Colors.grey[300],
-                            child: const Icon(Icons.image, size: 50),
+                            color: isDarkMode
+                                ? const Color(0xFF2C2C2C)
+                                : Colors.grey[200],
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.image_not_supported_outlined,
+                                  size: 50,
+                                  color: isDarkMode
+                                      ? const Color(0xFFB0B0B0)
+                                      : Colors.grey[400],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Image not available',
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? const Color(0xFFB0B0B0)
+                                        : Colors.grey[600],
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
                           );
                         },
                       ),
@@ -243,17 +390,18 @@ class _StressModulesScreenState extends State<StressModulesScreen> {
                     const SizedBox(height: 16),
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
+                        color: textColor,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       subtitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
-                        color: Colors.black54,
+                        color: subTextColor,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -261,17 +409,20 @@ class _StressModulesScreenState extends State<StressModulesScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Progress',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
+                              color: textColor,
                             ),
                           ),
                           const SizedBox(height: 8),
                           LinearProgressIndicator(
                             value: progress,
-                            backgroundColor: const Color(0xFFF3F1FF),
+                            backgroundColor: isDarkMode
+                                ? const Color(0xFF2C2C2C)
+                                : const Color(0xFFF3F1FF),
                             valueColor:
                                 const AlwaysStoppedAnimation(Color(0xFF7B61FF)),
                             minHeight: 8,
@@ -319,11 +470,11 @@ class _StressModulesScreenState extends State<StressModulesScreen> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.08),
+              color: shadowColor,
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -340,12 +491,53 @@ class _StressModulesScreenState extends State<StressModulesScreen> {
                 height: 100,
                 width: double.infinity,
                 fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    height: 100,
+                    width: double.infinity,
+                    color:
+                        isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey[200],
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                        color: const Color(0xFF7B61FF),
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  );
+                },
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     height: 100,
                     width: double.infinity,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.image, size: 30),
+                    color:
+                        isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey[200],
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.image_not_supported_outlined,
+                          size: 30,
+                          color: isDarkMode
+                              ? const Color(0xFFB0B0B0)
+                              : Colors.grey[400],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Image not available',
+                          style: TextStyle(
+                            color: isDarkMode
+                                ? const Color(0xFFB0B0B0)
+                                : Colors.grey[600],
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),
@@ -353,14 +545,15 @@ class _StressModulesScreenState extends State<StressModulesScreen> {
             const SizedBox(height: 8),
             Text(
               title,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: 14, color: textColor),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 2),
             Text(
               subtitle,
-              style: const TextStyle(fontSize: 12, color: Colors.black54),
+              style: TextStyle(fontSize: 12, color: subTextColor),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -371,7 +564,9 @@ class _StressModulesScreenState extends State<StressModulesScreen> {
                 children: [
                   LinearProgressIndicator(
                     value: progress,
-                    backgroundColor: const Color(0xFFF3F1FF),
+                    backgroundColor: isDarkMode
+                        ? const Color(0xFF2C2C2C)
+                        : const Color(0xFFF3F1FF),
                     valueColor: const AlwaysStoppedAnimation(Color(0xFF7B61FF)),
                     minHeight: 5,
                     borderRadius: BorderRadius.circular(4),

@@ -8,6 +8,8 @@ import 'package:medcon30/doctor/modules/patients_screen.dart';
 import 'package:medcon30/doctor/modules/analytics_dashboard_screen.dart';
 import 'package:medcon30/doctor/profile/profile_display.dart';
 import 'package:medcon30/doctor/profile/profile_creation.dart';
+import 'package:medcon30/services/auth_service.dart';
+import 'package:medcon30/splash_screen.dart';
 
 class DoctorDashboard extends StatefulWidget {
   const DoctorDashboard({Key? key}) : super(key: key);
@@ -75,8 +77,8 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
 
     if (_isLoading) {
       return Scaffold(
@@ -178,6 +180,48 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                         isDarkMode ? Colors.grey[800] : Colors.white,
                   ),
                 );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.logout),
+              color: const Color(0xFF0288D1),
+              onPressed: () async {
+                // Show confirmation dialog
+                final shouldLogout = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Logout'),
+                    content: const Text('Are you sure you want to logout?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('Logout'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (shouldLogout == true) {
+                  try {
+                    await AuthService().signOut(context);
+                    if (mounted) {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const SplashScreen()),
+                        (route) => false,
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error logging out: $e')),
+                      );
+                    }
+                  }
+                }
               },
             ),
           ],

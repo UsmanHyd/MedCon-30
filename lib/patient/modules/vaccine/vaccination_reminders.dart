@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:medcon30/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:medcon30/theme/theme_provider.dart';
 
 class VaccinationReminder extends StatefulWidget {
   const VaccinationReminder({Key? key}) : super(key: key);
@@ -50,6 +52,14 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
   }
 
   void _showAddVaccinationDialog(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final bgColor = isDarkMode ? const Color(0xFF121212) : Colors.white;
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor = isDarkMode ? const Color(0xFFB0B0B0) : Colors.grey;
+    final borderColor =
+        isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade200;
+
     final formKey = GlobalKey<FormState>();
     String name = '';
     String dateGiven = '';
@@ -86,6 +96,7 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
       context: context,
       builder: (context) {
         return Dialog(
+          backgroundColor: bgColor,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Padding(
@@ -97,21 +108,33 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Add New Vaccination',
+                    Text('Add New Vaccination',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20)),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: textColor)),
                     const SizedBox(height: 20),
-                    const Text('Vaccine Name',
-                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    Text('Vaccine Name',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: textColor)),
                     const SizedBox(height: 6),
                     TextFormField(
-                      decoration: const InputDecoration(
+                      style: TextStyle(color: textColor),
+                      decoration: InputDecoration(
                         hintText: 'Enter vaccine name',
+                        hintStyle: TextStyle(color: subTextColor),
                         border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: borderColor)),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: borderColor)),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                const BorderSide(color: Color(0xFF7B61FF))),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 12),
                       ),
                       validator: (value) => value == null || value.isEmpty
                           ? 'Enter vaccine name'
@@ -119,21 +142,31 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                       onChanged: (value) => name = value,
                     ),
                     const SizedBox(height: 16),
-                    const Text('Date Given',
-                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    Text('Date Given',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: textColor)),
                     const SizedBox(height: 6),
                     Stack(
                       alignment: Alignment.centerRight,
                       children: [
                         TextFormField(
+                          style: TextStyle(color: textColor),
                           readOnly: true,
                           controller: TextEditingController(text: dateGiven),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'YYYY-MM-DD',
+                            hintStyle: TextStyle(color: subTextColor),
                             border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            contentPadding: EdgeInsets.symmetric(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: borderColor)),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: borderColor)),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFF7B61FF))),
+                            contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 12),
                           ),
                           onTap: () => pickDate(context, (val) {
@@ -142,8 +175,8 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                           }),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.calendar_today,
-                              size: 20, color: Colors.blueGrey),
+                          icon: Icon(Icons.calendar_today,
+                              size: 20, color: subTextColor),
                           onPressed: () => pickDate(context, (val) {
                             dateGiven = val;
                             (context as Element).markNeedsBuild();
@@ -152,21 +185,31 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    const Text('Next Dose Date *',
-                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    Text('Next Dose Date *',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: textColor)),
                     const SizedBox(height: 6),
                     Stack(
                       alignment: Alignment.centerRight,
                       children: [
                         TextFormField(
+                          style: TextStyle(color: textColor),
                           readOnly: true,
                           controller: TextEditingController(text: nextDoseDate),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'YYYY-MM-DD',
+                            hintStyle: TextStyle(color: subTextColor),
                             border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            contentPadding: EdgeInsets.symmetric(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: borderColor)),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: borderColor)),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFF7B61FF))),
+                            contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 12),
                           ),
                           validator: (value) => value == null || value.isEmpty
@@ -178,8 +221,8 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                           }),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.calendar_today,
-                              size: 20, color: Colors.blueGrey),
+                          icon: Icon(Icons.calendar_today,
+                              size: 20, color: subTextColor),
                           onPressed: () => pickDate(context, (val) {
                             nextDoseDate = val;
                             (context as Element).markNeedsBuild();
@@ -188,23 +231,33 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    const Text('Reminder Time *',
-                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    Text('Reminder Time *',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: textColor)),
                     const SizedBox(height: 6),
                     Stack(
                       alignment: Alignment.centerRight,
                       children: [
                         TextFormField(
+                          style: TextStyle(color: textColor),
                           readOnly: true,
                           controller: TextEditingController(
                             text: reminderTime.format(context),
                           ),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'Select reminder time',
+                            hintStyle: TextStyle(color: subTextColor),
                             border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            contentPadding: EdgeInsets.symmetric(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: borderColor)),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: borderColor)),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFF7B61FF))),
+                            contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 12),
                           ),
                           validator: (value) => value == null || value.isEmpty
@@ -213,31 +266,42 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                           onTap: () => pickTime(context),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.access_time,
-                              size: 20, color: Colors.blueGrey),
+                          icon: Icon(Icons.access_time,
+                              size: 20, color: subTextColor),
                           onPressed: () => pickTime(context),
                         ),
                       ],
                     ),
                     const SizedBox(height: 4),
-                    const Text(
+                    Text(
                       'Setting reminder is required for tracking',
-                      style: TextStyle(fontSize: 12, color: Colors.blue),
+                      style: TextStyle(
+                          fontSize: 12, color: const Color(0xFF7B61FF)),
                     ),
                     const SizedBox(height: 16),
-                    const Text('Notes',
-                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    Text('Notes',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: textColor)),
                     const SizedBox(height: 6),
                     TextFormField(
+                      style: TextStyle(color: textColor),
                       minLines: 2,
                       maxLines: 4,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Add any additional notes',
+                        hintStyle: TextStyle(color: subTextColor),
                         border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: borderColor)),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: borderColor)),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                const BorderSide(color: Color(0xFF7B61FF))),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 12),
                       ),
                       onChanged: (value) => notes = value,
                     ),
@@ -249,19 +313,21 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                             style: OutlinedButton.styleFrom(
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8)),
-                              side: const BorderSide(color: Colors.grey),
+                              side: BorderSide(color: borderColor),
                               padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('Cancel',
-                                style: TextStyle(fontWeight: FontWeight.w500)),
+                            child: Text('Cancel',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: textColor)),
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.lightBlue,
+                              backgroundColor: const Color(0xFF7B61FF),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8)),
                               padding: const EdgeInsets.symmetric(vertical: 14),
@@ -288,16 +354,15 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
 
                                   await FirestoreService()
                                       .addVaccinationReminder(reminderData);
-                                  if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                            'Vaccination reminder added successfully'),
-                                        backgroundColor: Colors.green,
-                                      ),
-                                    );
-                                    Navigator.of(context).pop();
-                                  }
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Vaccination reminder added successfully'),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                  Navigator.of(context).pop();
                                 } catch (e) {
                                   if (mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -311,7 +376,9 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                               }
                             },
                             child: const Text('Save',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white)),
                           ),
                         ),
                       ],
@@ -328,6 +395,14 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
 
   void _showEditVaccinationDialog(
       BuildContext context, Map<String, dynamic> rec) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final bgColor = isDarkMode ? const Color(0xFF121212) : Colors.white;
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor = isDarkMode ? const Color(0xFFB0B0B0) : Colors.grey;
+    final borderColor =
+        isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade200;
+
     final formKey = GlobalKey<FormState>();
     String name = rec['name'] ?? '';
     String dateGiven = (rec['dates'] != null && rec['dates'].isNotEmpty)
@@ -377,6 +452,7 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
       context: context,
       builder: (context) {
         return Dialog(
+          backgroundColor: bgColor,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Padding(
@@ -388,22 +464,34 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Edit Vaccination',
+                    Text('Edit Vaccination',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20)),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: textColor)),
                     const SizedBox(height: 20),
-                    const Text('Vaccine Name',
-                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    Text('Vaccine Name',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: textColor)),
                     const SizedBox(height: 6),
                     TextFormField(
                       initialValue: name,
-                      decoration: const InputDecoration(
+                      style: TextStyle(color: textColor),
+                      decoration: InputDecoration(
                         hintText: 'Enter vaccine name',
+                        hintStyle: TextStyle(color: subTextColor),
                         border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: borderColor)),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: borderColor)),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                const BorderSide(color: Color(0xFF7B61FF))),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 12),
                       ),
                       validator: (value) => value == null || value.isEmpty
                           ? 'Enter vaccine name'
@@ -411,21 +499,31 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                       onChanged: (value) => name = value,
                     ),
                     const SizedBox(height: 16),
-                    const Text('Date Given',
-                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    Text('Date Given',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: textColor)),
                     const SizedBox(height: 6),
                     Stack(
                       alignment: Alignment.centerRight,
                       children: [
                         TextFormField(
+                          style: TextStyle(color: textColor),
                           readOnly: true,
                           controller: TextEditingController(text: dateGiven),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'YYYY-MM-DD',
+                            hintStyle: TextStyle(color: subTextColor),
                             border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            contentPadding: EdgeInsets.symmetric(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: borderColor)),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: borderColor)),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFF7B61FF))),
+                            contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 12),
                           ),
                           onTap: () => pickDate(context, (val) {
@@ -434,8 +532,8 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                           }, dateGiven),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.calendar_today,
-                              size: 20, color: Colors.blueGrey),
+                          icon: Icon(Icons.calendar_today,
+                              size: 20, color: subTextColor),
                           onPressed: () => pickDate(context, (val) {
                             dateGiven = val;
                             (context as Element).markNeedsBuild();
@@ -444,21 +542,31 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    const Text('Next Dose Date *',
-                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    Text('Next Dose Date *',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: textColor)),
                     const SizedBox(height: 6),
                     Stack(
                       alignment: Alignment.centerRight,
                       children: [
                         TextFormField(
+                          style: TextStyle(color: textColor),
                           readOnly: true,
                           controller: TextEditingController(text: nextDoseDate),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'YYYY-MM-DD',
+                            hintStyle: TextStyle(color: subTextColor),
                             border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            contentPadding: EdgeInsets.symmetric(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: borderColor)),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: borderColor)),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFF7B61FF))),
+                            contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 12),
                           ),
                           validator: (value) => value == null || value.isEmpty
@@ -470,8 +578,8 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                           }, nextDoseDate),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.calendar_today,
-                              size: 20, color: Colors.blueGrey),
+                          icon: Icon(Icons.calendar_today,
+                              size: 20, color: subTextColor),
                           onPressed: () => pickDate(context, (val) {
                             nextDoseDate = val;
                             (context as Element).markNeedsBuild();
@@ -480,23 +588,33 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    const Text('Reminder Time *',
-                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    Text('Reminder Time *',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: textColor)),
                     const SizedBox(height: 6),
                     Stack(
                       alignment: Alignment.centerRight,
                       children: [
                         TextFormField(
+                          style: TextStyle(color: textColor),
                           readOnly: true,
                           controller: TextEditingController(
                             text: reminderTime.format(context),
                           ),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'Select reminder time',
+                            hintStyle: TextStyle(color: subTextColor),
                             border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            contentPadding: EdgeInsets.symmetric(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: borderColor)),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(color: borderColor)),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFF7B61FF))),
+                            contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 12),
                           ),
                           validator: (value) => value == null || value.isEmpty
@@ -505,32 +623,43 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                           onTap: () => pickTime(context),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.access_time,
-                              size: 20, color: Colors.blueGrey),
+                          icon: Icon(Icons.access_time,
+                              size: 20, color: subTextColor),
                           onPressed: () => pickTime(context),
                         ),
                       ],
                     ),
                     const SizedBox(height: 4),
-                    const Text(
+                    Text(
                       'Setting reminder is required for tracking',
-                      style: TextStyle(fontSize: 12, color: Colors.blue),
+                      style: TextStyle(
+                          fontSize: 12, color: const Color(0xFF7B61FF)),
                     ),
                     const SizedBox(height: 16),
-                    const Text('Notes',
-                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    Text('Notes',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: textColor)),
                     const SizedBox(height: 6),
                     TextFormField(
                       initialValue: notes,
+                      style: TextStyle(color: textColor),
                       minLines: 2,
                       maxLines: 4,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Add any additional notes',
+                        hintStyle: TextStyle(color: subTextColor),
                         border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: borderColor)),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: borderColor)),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                const BorderSide(color: Color(0xFF7B61FF))),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 12),
                       ),
                       onChanged: (value) => notes = value,
                     ),
@@ -542,19 +671,21 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                             style: OutlinedButton.styleFrom(
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8)),
-                              side: const BorderSide(color: Colors.grey),
+                              side: BorderSide(color: borderColor),
                               padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('Cancel',
-                                style: TextStyle(fontWeight: FontWeight.w500)),
+                            child: Text('Cancel',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: textColor)),
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.lightBlue,
+                              backgroundColor: const Color(0xFF7B61FF),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8)),
                               padding: const EdgeInsets.symmetric(vertical: 14),
@@ -577,7 +708,9 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                               }
                             },
                             child: const Text('Save',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white)),
                           ),
                         ),
                       ],
@@ -594,10 +727,19 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
 
   void _showVaccinationDetailsDialog(
       BuildContext context, Map<String, dynamic> rec) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final bgColor = isDarkMode ? const Color(0xFF121212) : Colors.white;
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor = isDarkMode ? const Color(0xFFB0B0B0) : Colors.grey;
+    final borderColor =
+        isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade200;
+
     showDialog(
       context: context,
       builder: (context) {
         return Dialog(
+          backgroundColor: bgColor,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Padding(
@@ -606,63 +748,69 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Center(
+                Center(
                   child: Text('Vaccination Details',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: textColor)),
                 ),
                 const SizedBox(height: 18),
-                const Text('Vaccine Name',
-                    style: TextStyle(fontWeight: FontWeight.w500)),
-                Text(rec['name'] ?? '', style: const TextStyle(fontSize: 15)),
+                Text('Vaccine Name',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500, color: textColor)),
+                Text(rec['name'] ?? '',
+                    style: TextStyle(fontSize: 15, color: textColor)),
                 const SizedBox(height: 10),
-                const Text('Date Given',
-                    style: TextStyle(fontWeight: FontWeight.w500)),
+                Text('Date Given',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500, color: textColor)),
                 Text(
                     (rec['dates'] != null && rec['dates'].isNotEmpty)
                         ? rec['dates'][0]
                         : '',
-                    style: const TextStyle(fontSize: 15)),
+                    style: TextStyle(fontSize: 15, color: textColor)),
                 const SizedBox(height: 10),
-                const Text('Next Dose Date',
-                    style: TextStyle(fontWeight: FontWeight.w500)),
+                Text('Next Dose Date',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500, color: textColor)),
                 Text(
                     (rec['dates'] != null && rec['dates'].length > 1)
                         ? rec['dates'][1]
                         : '-',
-                    style: const TextStyle(fontSize: 15)),
+                    style: TextStyle(fontSize: 15, color: textColor)),
                 const SizedBox(height: 10),
-                const Text('Reminder Time',
-                    style: TextStyle(fontWeight: FontWeight.w500)),
-                Text(
-                    rec['reminderTime'] != null
-                        ? '${rec['reminderTime']}'
-                        : 'Not set',
-                    style: const TextStyle(fontSize: 15)),
+                Text('Reminder Time',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500, color: textColor)),
+                Text(rec['reminderTime'] ?? '-',
+                    style: TextStyle(fontSize: 15, color: textColor)),
                 const SizedBox(height: 10),
-                const Text('Notes',
-                    style: TextStyle(fontWeight: FontWeight.w500)),
-                Text(rec['notes'] ?? '—', style: const TextStyle(fontSize: 15)),
-                const SizedBox(height: 10),
-                const Text('Status',
-                    style: TextStyle(fontWeight: FontWeight.w500)),
+                Text('Status',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500, color: textColor)),
                 Container(
-                  margin: const EdgeInsets.only(top: 4, bottom: 16),
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 7),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    color: statusColor(rec['status']),
-                    borderRadius: BorderRadius.circular(20),
+                    color: statusColor(rec['status'] ?? ''),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    rec['status'],
+                    rec['status'] ?? '',
                     style: const TextStyle(
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12),
                   ),
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 10),
+                Text('Notes',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500, color: textColor)),
+                Text(rec['notes'] ?? '-',
+                    style: TextStyle(fontSize: 15, color: textColor)),
+                const SizedBox(height: 24),
                 Row(
                   children: [
                     Expanded(
@@ -702,17 +850,21 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                             }
                           }
                         },
-                        child: const Text('Completed',
+                        child: const Text('Mark as Completed',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold)),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
                     Expanded(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red[600],
+                          backgroundColor: Colors.red[400],
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10)),
                           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -759,7 +911,7 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                     Expanded(
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue[400],
+                          backgroundColor: const Color(0xFF7B61FF),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8)),
                           padding: const EdgeInsets.symmetric(vertical: 12),
@@ -775,56 +927,17 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                     ),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red[400],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                        icon: const Icon(Icons.delete, color: Colors.white),
-                        label: const Text('Delete',
-                            style: TextStyle(color: Colors.white)),
-                        onPressed: () async {
-                          try {
-                            await FirestoreService()
-                                .deleteVaccinationReminder(rec['id']);
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                      'Vaccination record deleted successfully'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                              Navigator.of(context).pop();
-                            }
-                          } catch (e) {
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                      'Error deleting record: ${e.toString()}'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          }
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8)),
-                          side: const BorderSide(color: Colors.grey),
+                          side: BorderSide(color: borderColor),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Close',
-                            style: TextStyle(fontWeight: FontWeight.w500)),
+                        child: Text('Close',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500, color: textColor)),
                       ),
                     ),
                   ],
@@ -839,17 +952,26 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final bgColor = isDarkMode ? const Color(0xFF121212) : Colors.white;
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor = isDarkMode ? const Color(0xFFB0B0B0) : Colors.grey;
+    final borderColor =
+        isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade200;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Vaccination Reminder',
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+        title: Text('Vaccination Reminder',
+            style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: bgColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        surfaceTintColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
+        surfaceTintColor: bgColor,
+        iconTheme: IconThemeData(color: textColor),
       ),
+      backgroundColor: bgColor,
       body: Column(
         children: [
           Padding(
@@ -862,7 +984,7 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.lightBlue[300],
+                      backgroundColor: const Color(0xFF7B61FF),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -871,15 +993,21 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                     onPressed: () => _showAddVaccinationDialog(context),
                     child: const Text(
                       "+ Add New Vaccination",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
+                Text(
                   "Your Vaccination Records",
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: textColor,
+                  ),
                 ),
               ],
             ),
@@ -890,12 +1018,19 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                   _firestore.collection('vaccination_reminders').snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: const Color(0xFF7B61FF),
+                    ),
+                  );
                 }
 
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const Center(
-                    child: Text('No vaccination records found.'),
+                  return Center(
+                    child: Text(
+                      'No vaccination records found.',
+                      style: TextStyle(color: textColor),
+                    ),
                   );
                 }
                 final records = snapshot.data!.docs;
@@ -911,8 +1046,10 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                       child: Card(
                         margin: const EdgeInsets.symmetric(vertical: 6),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: borderColor),
+                        ),
+                        color: cardColor,
                         elevation: 1,
                         child: Padding(
                           padding: const EdgeInsets.all(14),
@@ -925,9 +1062,11 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                                   children: [
                                     Text(
                                       rec["name"] ?? '',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: textColor,
+                                      ),
                                     ),
                                     const SizedBox(height: 4),
                                     if (rec["dates"] != null)
@@ -935,8 +1074,10 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                                         (rec["dates"] as List).length,
                                         (i) => Text(
                                           "• ${rec["dates"][i]}",
-                                          style: const TextStyle(
-                                              fontSize: 13, color: Colors.grey),
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: subTextColor,
+                                          ),
                                         ),
                                       ),
                                   ],
@@ -952,9 +1093,10 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
                                 child: Text(
                                   rec["status"] ?? '',
                                   style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13),
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ),
                             ],
@@ -967,36 +1109,44 @@ class _VaccinationReminderState extends State<VaccinationReminder> {
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.grey.shade200),
-                borderRadius: BorderRadius.circular(12),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: cardColor,
+              border: Border(
+                top: BorderSide(color: borderColor),
               ),
-              padding: const EdgeInsets.all(12),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "ℹ️ How to Use Vaccination Records",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "ℹ️ How to Use Vaccination Records",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: textColor,
                   ),
-                  SizedBox(height: 4),
-                  Text(
-                    "Keep track of your immunization history and upcoming vaccination schedules. Tap on any record to view details or make updates.",
-                    style: TextStyle(fontSize: 13),
-                  ),
-                  SizedBox(height: 6),
-                  Text("• Green badge indicates completed vaccinations",
-                      style: TextStyle(fontSize: 13)),
-                  Text("• Yellow badge shows pending vaccinations",
-                      style: TextStyle(fontSize: 13)),
-                  Text("• Red badge indicates missed appointments",
-                      style: TextStyle(fontSize: 13)),
-                ],
-              ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Keep track of your immunization history and upcoming vaccination schedules. Tap on any record to view details or make updates.",
+                  style: TextStyle(fontSize: 13, color: subTextColor),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  "• Green badge indicates completed vaccinations",
+                  style: TextStyle(fontSize: 13, color: subTextColor),
+                ),
+                Text(
+                  "• Yellow badge shows pending vaccinations",
+                  style: TextStyle(fontSize: 13, color: subTextColor),
+                ),
+                Text(
+                  "• Red badge indicates missed appointments",
+                  style: TextStyle(fontSize: 13, color: subTextColor),
+                ),
+              ],
             ),
           ),
         ],

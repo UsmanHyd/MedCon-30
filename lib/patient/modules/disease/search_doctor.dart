@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:medcon30/theme/theme_provider.dart';
 import 'doctor_profile.dart';
 
 class SearchDoctorScreen extends StatefulWidget {
@@ -52,46 +54,58 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final bgColor = isDarkMode ? Colors.grey[900] : const Color(0xFFE0F7FA);
+    final cardColor = isDarkMode ? Colors.grey[850] : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.blueGrey[900];
+    final subTextColor = isDarkMode ? Colors.grey[400] : Colors.blueGrey[700];
+
     return Scaffold(
-      backgroundColor: const Color(0xFFE0F7FA),
+      backgroundColor: bgColor,
       body: SafeArea(
         child: Column(
           children: [
             // Top bar
             Container(
-              color: const Color(0xFFE0F7FA),
+              color: bgColor,
               padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16),
               child: Row(
                 children: [
                   IconButton(
                     icon: Icon(Icons.arrow_back_ios_new,
-                        size: 20, color: Colors.blueGrey[900]),
+                        size: 20, color: textColor),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   Expanded(
                     child: Center(
                       child: Text(
-                        'Nearby Doctors',
+                        'Search for Doctors',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 19,
-                          color: Colors.blueGrey[900],
+                          color: textColor,
                         ),
                       ),
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(right: 18.0),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 18.0),
                     child: Icon(Icons.help_outline,
-                        color: Color(0xFF2196F3), size: 20),
+                        color: isDarkMode
+                            ? Colors.blue[300]
+                            : const Color(0xFF2196F3),
+                        size: 20),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, thickness: 1, color: Color(0xFFE0E3EA)),
+            Divider(
+                height: 1,
+                thickness: 1,
+                color: isDarkMode ? Colors.grey[800] : const Color(0xFFE0E3EA)),
             // Filters
             Container(
-              color: const Color(0xFFE0F7FA),
+              color: bgColor,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -105,9 +119,10 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                         selected: selected,
                         onSelected: (_) => setState(() => selectedFilter = i),
                         selectedColor: const Color(0xFF2196F3),
-                        backgroundColor: Colors.white,
+                        backgroundColor:
+                            isDarkMode ? Colors.grey[800] : Colors.white,
                         labelStyle: TextStyle(
-                          color: selected ? Colors.white : Colors.blueGrey[900],
+                          color: selected ? Colors.white : textColor,
                           fontWeight: FontWeight.w600,
                         ),
                         shape: RoundedRectangleBorder(
@@ -115,7 +130,9 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                           side: BorderSide(
                             color: selected
                                 ? const Color(0xFF2196F3)
-                                : const Color(0xFFE0E3EA),
+                                : isDarkMode
+                                    ? Colors.grey[700]!
+                                    : const Color(0xFFE0E3EA),
                             width: 1.5,
                           ),
                         ),
@@ -137,11 +154,13 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                     margin: const EdgeInsets.only(bottom: 18),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: cardColor,
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
+                          color: isDarkMode
+                              ? Colors.black.withOpacity(0.2)
+                              : Colors.black.withOpacity(0.04),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -155,11 +174,14 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                           child: Container(
                             width: 48,
                             height: 48,
-                            color: Colors.blue[50],
+                            color:
+                                isDarkMode ? Colors.grey[800] : Colors.blue[50],
                             child: Icon(
                               Icons.account_circle,
                               size: 48,
-                              color: Colors.blueGrey[200],
+                              color: isDarkMode
+                                  ? Colors.grey[600]
+                                  : Colors.blueGrey[200],
                             ),
                           ),
                         ),
@@ -173,14 +195,14 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
-                                  color: Colors.blueGrey[900],
+                                  color: textColor,
                                 ),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 doc['specialty'],
                                 style: TextStyle(
-                                  color: Colors.blueGrey[700],
+                                  color: subTextColor,
                                   fontSize: 14,
                                 ),
                               ),
@@ -193,7 +215,7 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                                   Text(
                                     '${doc['rating']}',
                                     style: TextStyle(
-                                      color: Colors.blueGrey[900],
+                                      color: textColor,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14,
                                     ),
@@ -202,7 +224,9 @@ class _SearchDoctorScreenState extends State<SearchDoctorScreen> {
                                   Text(
                                     '(${doc['reviews']})',
                                     style: TextStyle(
-                                      color: Colors.blueGrey[400],
+                                      color: isDarkMode
+                                          ? Colors.grey[500]
+                                          : Colors.blueGrey[400],
                                       fontSize: 13,
                                     ),
                                   ),

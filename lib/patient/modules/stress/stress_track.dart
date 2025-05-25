@@ -3,21 +3,26 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'stress_detailed_insights.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:provider/provider.dart';
+import 'package:medcon30/theme/theme_provider.dart';
 
 class StressTrackScreen extends StatelessWidget {
   const StressTrackScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final bgColor = isDarkMode ? const Color(0xFF121212) : Colors.white;
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor =
+        isDarkMode ? const Color(0xFFB0B0B0) : const Color(0xFF757575);
+    final shadowColor = isDarkMode
+        ? Colors.black.withOpacity(0.2)
+        : Colors.grey.withOpacity(0.08);
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Stress Track'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        surfaceTintColor: Colors.white,
-      ),
+      backgroundColor: bgColor,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -28,7 +33,7 @@ class StressTrackScreen extends StatelessWidget {
               Card(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16)),
-                color: Colors.white,
+                color: cardColor,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
@@ -37,27 +42,45 @@ class StressTrackScreen extends StatelessWidget {
                         radius: 40.0,
                         lineWidth: 8.0,
                         percent: 0.75,
-                        center: const Text('75%',
+                        center: Text('75%',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20)),
-                        progressColor: Colors.indigo,
-                        backgroundColor: Colors.indigo.shade50,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: textColor)),
+                        progressColor: const Color(0xFF7B61FF),
+                        backgroundColor: isDarkMode
+                            ? const Color(0xFF2C2C2C)
+                            : const Color(0xFFF3F1FF),
                       ),
                       const SizedBox(width: 24),
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('Overall Progress',
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 16)),
-                          SizedBox(height: 8),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: textColor)),
+                          const SizedBox(height: 8),
                           Row(
                             children: [
-                              _StatColumn(label: 'Time Spent', value: '12.5h'),
-                              SizedBox(width: 16),
-                              _StatColumn(label: 'Streak', value: '8 days'),
-                              SizedBox(width: 16),
-                              _StatColumn(label: 'Badges', value: '12'),
+                              _StatColumn(
+                                  label: 'Time Spent',
+                                  value: '12.5h',
+                                  textColor: textColor,
+                                  subTextColor: subTextColor),
+                              const SizedBox(width: 16),
+                              _StatColumn(
+                                  label: 'Streak',
+                                  value: '8 days',
+                                  textColor: textColor,
+                                  subTextColor: subTextColor),
+                              const SizedBox(width: 16),
+                              _StatColumn(
+                                  label: 'Badges',
+                                  value: '12',
+                                  textColor: textColor,
+                                  subTextColor: subTextColor),
                             ],
                           ),
                         ],
@@ -68,13 +91,16 @@ class StressTrackScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               // Weekly Activity
-              const Text('Weekly Activity',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text('Weekly Activity',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: textColor)),
               const SizedBox(height: 8),
               Card(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16)),
-                color: Colors.white,
+                color: cardColor,
                 child: SizedBox(
                   height: 180,
                   child: Padding(
@@ -87,9 +113,20 @@ class StressTrackScreen extends StatelessWidget {
                         minY: 0,
                         barTouchData: BarTouchData(enabled: false),
                         titlesData: FlTitlesData(
-                          leftTitles: const AxisTitles(
-                            sideTitles:
-                                SideTitles(showTitles: true, reservedSize: 28),
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 28,
+                              getTitlesWidget: (value, meta) {
+                                return Text(
+                                  value.toInt().toString(),
+                                  style: TextStyle(
+                                    color: subTextColor,
+                                    fontSize: 11,
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                           bottomTitles: AxisTitles(
                             sideTitles: SideTitles(
@@ -105,7 +142,10 @@ class StressTrackScreen extends StatelessWidget {
                                   padding: const EdgeInsets.only(top: 6.0),
                                   child: Text(
                                     days[value.toInt() % 4],
-                                    style: const TextStyle(fontSize: 11),
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: subTextColor,
+                                    ),
                                   ),
                                 );
                               },
@@ -118,78 +158,89 @@ class StressTrackScreen extends StatelessWidget {
                               sideTitles: SideTitles(showTitles: false)),
                         ),
                         borderData: FlBorderData(show: false),
+                        gridData: FlGridData(
+                          show: true,
+                          drawVerticalLine: false,
+                          horizontalInterval: 10,
+                          getDrawingHorizontalLine: (value) {
+                            return FlLine(
+                              color: isDarkMode
+                                  ? const Color(0xFF2C2C2C)
+                                  : Colors.grey[200],
+                              strokeWidth: 1,
+                            );
+                          },
+                        ),
                         barGroups: [
                           BarChartGroupData(x: 0, barsSpace: 4, barRods: [
                             BarChartRodData(
                                 toY: 20,
-                                color: Colors.blue,
+                                color: const Color(0xFF7B61FF),
                                 width: 10,
                                 borderRadius: BorderRadius.circular(4)),
                             BarChartRodData(
                                 toY: 30,
-                                color: Colors.indigo,
+                                color: const Color(0xFF7B9EFF),
                                 width: 10,
                                 borderRadius: BorderRadius.circular(4)),
                             BarChartRodData(
                                 toY: 50,
-                                color: Colors.amber,
+                                color: const Color(0xFF4ADE80),
                                 width: 10,
                                 borderRadius: BorderRadius.circular(4)),
                           ]),
                           BarChartGroupData(x: 1, barsSpace: 4, barRods: [
                             BarChartRodData(
                                 toY: 22,
-                                color: Colors.blue,
+                                color: const Color(0xFF7B61FF),
                                 width: 10,
                                 borderRadius: BorderRadius.circular(4)),
                             BarChartRodData(
                                 toY: 28,
-                                color: Colors.indigo,
+                                color: const Color(0xFF7B9EFF),
                                 width: 10,
                                 borderRadius: BorderRadius.circular(4)),
                             BarChartRodData(
                                 toY: 48,
-                                color: Colors.amber,
+                                color: const Color(0xFF4ADE80),
                                 width: 10,
                                 borderRadius: BorderRadius.circular(4)),
                           ]),
                           BarChartGroupData(x: 2, barsSpace: 4, barRods: [
                             BarChartRodData(
                                 toY: 12,
-                                color: Colors.blue,
+                                color: const Color(0xFF7B61FF),
                                 width: 10,
                                 borderRadius: BorderRadius.circular(4)),
                             BarChartRodData(
                                 toY: 20,
-                                color: Colors.indigo,
+                                color: const Color(0xFF7B9EFF),
                                 width: 10,
                                 borderRadius: BorderRadius.circular(4)),
                             BarChartRodData(
                                 toY: 28,
-                                color: Colors.amber,
+                                color: const Color(0xFF4ADE80),
                                 width: 10,
                                 borderRadius: BorderRadius.circular(4)),
                           ]),
                           BarChartGroupData(x: 3, barsSpace: 4, barRods: [
                             BarChartRodData(
                                 toY: 18,
-                                color: Colors.blue,
+                                color: const Color(0xFF7B61FF),
                                 width: 10,
                                 borderRadius: BorderRadius.circular(4)),
                             BarChartRodData(
                                 toY: 22,
-                                color: Colors.indigo,
+                                color: const Color(0xFF7B9EFF),
                                 width: 10,
                                 borderRadius: BorderRadius.circular(4)),
                             BarChartRodData(
                                 toY: 40,
-                                color: Colors.amber,
+                                color: const Color(0xFF4ADE80),
                                 width: 10,
                                 borderRadius: BorderRadius.circular(4)),
                           ]),
                         ],
-                        gridData: const FlGridData(
-                            show: true, drawVerticalLine: false),
                       ),
                     ),
                   ),
@@ -197,28 +248,56 @@ class StressTrackScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               // Category Progress
-              const Text('Category Progress',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text('Category Progress',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: textColor)),
               const SizedBox(height: 8),
-              _CategoryProgress(),
+              _CategoryProgress(
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor),
               const SizedBox(height: 16),
               // Recent Activity
-              const Text('Recent Activity',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text('Recent Activity',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: textColor)),
               const SizedBox(height: 8),
-              _RecentActivity(),
+              _RecentActivity(
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor),
               const SizedBox(height: 16),
               // Achievements
-              const Text('Achievements',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text('Achievements',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: textColor)),
               const SizedBox(height: 8),
-              _Achievements(),
+              _Achievements(
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor),
               const SizedBox(height: 16),
               // Insights
-              const Text('Insights',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text('Insights',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: textColor)),
               const SizedBox(height: 8),
-              _Insights(),
+              _Insights(
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor),
               const SizedBox(height: 24),
             ],
           ),
@@ -231,59 +310,101 @@ class StressTrackScreen extends StatelessWidget {
 class _StatColumn extends StatelessWidget {
   final String label;
   final String value;
-  const _StatColumn({required this.label, required this.value});
+  final Color textColor;
+  final Color subTextColor;
+
+  const _StatColumn({
+    required this.label,
+    required this.value,
+    required this.textColor,
+    required this.subTextColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        Text(label, style: TextStyle(fontSize: 12, color: subTextColor)),
         Text(value,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            style: TextStyle(
+                fontWeight: FontWeight.bold, fontSize: 14, color: textColor)),
       ],
     );
   }
 }
 
 class _CategoryProgress extends StatelessWidget {
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+
+  const _CategoryProgress({
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: [
         _CategoryTile(
           icon: Icons.spa_rounded,
-          color: Colors.blue,
+          color: const Color(0xFF7B61FF),
           title: 'Breathing Exercises',
           percent: 0.75,
           lastSession: 'Deep Breathing, 15 min (May 1, 2025)',
+          isDarkMode: isDarkMode,
+          cardColor: cardColor,
+          textColor: textColor,
+          subTextColor: subTextColor,
         ),
         _CategoryTile(
           icon: Icons.self_improvement_rounded,
-          color: Colors.purple,
+          color: const Color(0xFF7B9EFF),
           title: 'Meditation',
           percent: 0.5,
           lastSession: 'Guided Meditation, 20 min (Apr 30, 2025)',
+          isDarkMode: isDarkMode,
+          cardColor: cardColor,
+          textColor: textColor,
+          subTextColor: subTextColor,
         ),
         _CategoryTile(
           icon: Icons.directions_run_rounded,
-          color: Colors.green,
+          color: const Color(0xFF4ADE80),
           title: 'Physical Activities',
           percent: 0.6,
           lastSession: 'Stretching, 10 min (Apr 29, 2025)',
+          isDarkMode: isDarkMode,
+          cardColor: cardColor,
+          textColor: textColor,
+          subTextColor: subTextColor,
         ),
         _CategoryTile(
           icon: Icons.nightlight_round,
-          color: Colors.indigo,
+          color: const Color(0xFF7B61FF),
           title: 'Sleep Improvement',
           percent: 0.2,
           lastSession: 'Bedtime Routine, 15 min (Apr 28, 2025)',
+          isDarkMode: isDarkMode,
+          cardColor: cardColor,
+          textColor: textColor,
+          subTextColor: subTextColor,
         ),
         _CategoryTile(
           icon: Icons.psychology_rounded,
-          color: Colors.orange,
+          color: const Color(0xFF7B9EFF),
           title: 'Stress Education',
           percent: 0.8,
           lastSession: 'Understanding Stress, 25 min (May 1, 2025)',
+          isDarkMode: isDarkMode,
+          cardColor: cardColor,
+          textColor: textColor,
+          subTextColor: subTextColor,
         ),
       ],
     );
@@ -296,17 +417,28 @@ class _CategoryTile extends StatelessWidget {
   final String title;
   final double percent;
   final String lastSession;
-  const _CategoryTile(
-      {required this.icon,
-      required this.color,
-      required this.title,
-      required this.percent,
-      required this.lastSession});
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+
+  const _CategoryTile({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.percent,
+    required this.lastSession,
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: Colors.white,
+      color: cardColor,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(
@@ -323,8 +455,10 @@ class _CategoryTile extends StatelessWidget {
                   Row(
                     children: [
                       Text(title,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 15)),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              color: textColor)),
                       const Spacer(),
                       Text('${(percent * 100).toInt()}%',
                           style: TextStyle(
@@ -336,13 +470,15 @@ class _CategoryTile extends StatelessWidget {
                     lineHeight: 6.0,
                     percent: percent,
                     progressColor: color,
-                    backgroundColor: color.withOpacity(0.1),
+                    backgroundColor: isDarkMode
+                        ? const Color(0xFF2C2C2C)
+                        : color.withOpacity(0.1),
                     barRadius: const Radius.circular(8),
                     padding: EdgeInsets.zero,
                   ),
                   const SizedBox(height: 4),
                   Text('Last session: $lastSession',
-                      style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                      style: TextStyle(fontSize: 12, color: subTextColor)),
                 ],
               ),
             ),
@@ -354,55 +490,76 @@ class _CategoryTile extends StatelessWidget {
 }
 
 class _RecentActivity extends StatelessWidget {
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+
+  const _RecentActivity({
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: Colors.white,
+      color: cardColor,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
-            const _ActivityTile(
+            _ActivityTile(
               icon: Icons.spa_rounded,
-              color: Colors.blue,
+              color: const Color(0xFF7B61FF),
               title: 'Deep Breathing',
               subtitle: '15 minutes session',
               time: 'Today 10:30 AM',
               status: 'Completed',
-              statusColor: Colors.green,
+              statusColor: const Color(0xFF4ADE80),
+              textColor: textColor,
+              subTextColor: subTextColor,
             ),
-            const _ActivityTile(
+            _ActivityTile(
               icon: Icons.psychology_rounded,
-              color: Colors.orange,
+              color: const Color(0xFF7B9EFF),
               title: 'Understanding Stress',
               subtitle: '25 minutes session',
               time: 'Today 8:15 AM',
               status: 'Completed',
-              statusColor: Colors.green,
+              statusColor: const Color(0xFF4ADE80),
+              textColor: textColor,
+              subTextColor: subTextColor,
             ),
-            const _ActivityTile(
+            _ActivityTile(
               icon: Icons.self_improvement_rounded,
-              color: Colors.purple,
+              color: const Color(0xFF7B61FF),
               title: 'Guided Meditation',
               subtitle: '20 minutes session',
               time: 'Yesterday 9:45 PM',
               status: 'Completed',
-              statusColor: Colors.green,
+              statusColor: const Color(0xFF4ADE80),
+              textColor: textColor,
+              subTextColor: subTextColor,
             ),
-            const _ActivityTile(
+            _ActivityTile(
               icon: Icons.directions_run_rounded,
-              color: Colors.green,
+              color: const Color(0xFF4ADE80),
               title: 'Stretching',
               subtitle: '10 minutes session',
               time: 'Apr 29 7:30 AM',
               status: 'Partial',
-              statusColor: Colors.orange,
+              statusColor: const Color(0xFF7B9EFF),
+              textColor: textColor,
+              subTextColor: subTextColor,
             ),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () {},
-              child: const Text('View All Activity'),
+              child: Text('View All Activity',
+                  style: TextStyle(color: const Color(0xFF7B61FF))),
             ),
           ],
         ),
@@ -419,27 +576,35 @@ class _ActivityTile extends StatelessWidget {
   final String time;
   final String status;
   final Color statusColor;
-  const _ActivityTile(
-      {required this.icon,
-      required this.color,
-      required this.title,
-      required this.subtitle,
-      required this.time,
-      required this.status,
-      required this.statusColor});
+  final Color textColor;
+  final Color subTextColor;
+
+  const _ActivityTile({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.subtitle,
+    required this.time,
+    required this.status,
+    required this.statusColor,
+    required this.textColor,
+    required this.subTextColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
       leading: CircleAvatar(
           backgroundColor: color.withOpacity(0.1),
           child: Icon(icon, color: color)),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text(subtitle),
+      title: Text(title,
+          style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+      subtitle: Text(subtitle, style: TextStyle(color: subTextColor)),
       trailing: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(time, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          Text(time, style: TextStyle(fontSize: 12, color: subTextColor)),
           const SizedBox(height: 2),
           Text(status,
               style: TextStyle(
@@ -454,37 +619,56 @@ class _ActivityTile extends StatelessWidget {
 }
 
 class _Achievements extends StatelessWidget {
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+
+  const _Achievements({
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: Colors.white,
+      color: cardColor,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
-            const _AchievementTile(
+            _AchievementTile(
               icon: Icons.emoji_events_rounded,
-              color: Colors.purple,
+              color: const Color(0xFF7B61FF),
               title: '8-Day Streak',
               subtitle: 'Keep going! You\'re building a great habit.',
+              textColor: textColor,
+              subTextColor: subTextColor,
             ),
-            const _AchievementTile(
+            _AchievementTile(
               icon: Icons.emoji_events_rounded,
-              color: Colors.orange,
+              color: const Color(0xFF7B9EFF),
               title: 'Stress Expert',
               subtitle: 'Completed 80% of Stress Education modules.',
+              textColor: textColor,
+              subTextColor: subTextColor,
             ),
-            const _AchievementTile(
+            _AchievementTile(
               icon: Icons.emoji_events_rounded,
-              color: Colors.blue,
+              color: const Color(0xFF4ADE80),
               title: 'Breathing Master',
               subtitle: 'Completed 75% of Breathing Exercises.',
+              textColor: textColor,
+              subTextColor: subTextColor,
             ),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () {},
-              child: const Text('View All Achievements'),
+              child: Text('View All Achievements',
+                  style: TextStyle(color: const Color(0xFF7B61FF))),
             ),
           ],
         ),
@@ -498,11 +682,18 @@ class _AchievementTile extends StatelessWidget {
   final Color color;
   final String title;
   final String subtitle;
-  const _AchievementTile(
-      {required this.icon,
-      required this.color,
-      required this.title,
-      required this.subtitle});
+  final Color textColor;
+  final Color subTextColor;
+
+  const _AchievementTile({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.subtitle,
+    required this.textColor,
+    required this.subTextColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -510,45 +701,58 @@ class _AchievementTile extends StatelessWidget {
           backgroundColor: color.withOpacity(0.1),
           child: Icon(icon, color: color)),
       title: Text(title,
-          style: TextStyle(fontWeight: FontWeight.bold, color: color)),
-      subtitle: Text(subtitle),
-      contentPadding: const EdgeInsets.symmetric(vertical: 2.0),
+          style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+      subtitle: Text(subtitle, style: TextStyle(color: subTextColor)),
+      contentPadding: const EdgeInsets.symmetric(vertical: 4.0),
     );
   }
 }
 
 class _Insights extends StatelessWidget {
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+
+  const _Insights({
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: Colors.white,
+      color: cardColor,
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Your Best Time',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            const Text(
-                'You tend to complete more exercises in the morning (8-11 AM). Consider scheduling important sessions during this time.',
-                style: TextStyle(fontSize: 13)),
+            Text('Your Progress',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: textColor)),
             const SizedBox(height: 12),
-            const Text('Most Practiced',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            const Text(
-                'Your most consistent practice is Deep Breathing. Great job maintaining this routine!',
-                style: TextStyle(fontSize: 13)),
+            Text(
+              'You\'ve made great progress in managing your stress levels. Your consistency in practicing breathing exercises and meditation has shown positive results.',
+              style: TextStyle(fontSize: 14, color: subTextColor),
+            ),
+            const SizedBox(height: 16),
+            Text('Recommendations',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: textColor)),
             const SizedBox(height: 12),
-            const Text('Suggested Focus',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            const Text(
-                'Your Sleep Improvement modules have the lowest completion rate. Consider focusing on these exercises next.',
-                style: TextStyle(fontSize: 13)),
-            const SizedBox(height: 8),
+            Text(
+              'Try to maintain your current routine and consider adding more physical activities to your schedule.',
+              style: TextStyle(fontSize: 14, color: subTextColor),
+            ),
+            const SizedBox(height: 16),
             TextButton(
               onPressed: () {
                 Navigator.of(context).push(
@@ -557,7 +761,8 @@ class _Insights extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text('View Detailed Insights'),
+              child: Text('View Detailed Insights',
+                  style: TextStyle(color: const Color(0xFF7B61FF))),
             ),
           ],
         ),

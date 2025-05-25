@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'search_doctor.dart';
+import 'package:provider/provider.dart';
+import 'package:medcon30/theme/theme_provider.dart';
 
 class DiagnosisScreen extends StatelessWidget {
   final List<Map<String, dynamic>> diagnoses = [
@@ -54,20 +56,23 @@ class DiagnosisScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Scaffold(
-      backgroundColor: const Color(0xFFE0F7FA),
+      backgroundColor: isDarkMode ? Colors.grey[900] : const Color(0xFFE0F7FA),
       body: SafeArea(
         child: Column(
           children: [
             // Top bar
             Container(
-              color: const Color(0xFFE0F7FA),
+              color: isDarkMode ? Colors.grey[850] : const Color(0xFFE0F7FA),
               padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16),
               child: Row(
                 children: [
                   IconButton(
                     icon: Icon(Icons.arrow_back_ios_new,
-                        size: 20, color: Colors.blueGrey[900]),
+                        size: 20,
+                        color:
+                            isDarkMode ? Colors.white : Colors.blueGrey[900]),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   Expanded(
@@ -77,20 +82,27 @@ class DiagnosisScreen extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 19,
-                          color: Colors.blueGrey[900],
+                          color:
+                              isDarkMode ? Colors.white : Colors.blueGrey[900],
                         ),
                       ),
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(right: 18.0),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 18.0),
                     child: Icon(Icons.help_outline,
-                        color: Color(0xFF2196F3), size: 20),
+                        color: isDarkMode
+                            ? Colors.blue[300]
+                            : const Color(0xFF2196F3),
+                        size: 20),
                   ),
                 ],
               ),
             ),
-            const Divider(height: 1, thickness: 1, color: Color(0xFFE0E3EA)),
+            Divider(
+                height: 1,
+                thickness: 1,
+                color: isDarkMode ? Colors.grey[800] : const Color(0xFFE0E3EA)),
             Expanded(
               child: ListView(
                 padding:
@@ -102,7 +114,7 @@ class DiagnosisScreen extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: Colors.blueGrey[900],
+                      color: isDarkMode ? Colors.white : Colors.blueGrey[900],
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -110,11 +122,13 @@ class DiagnosisScreen extends StatelessWidget {
                         margin: const EdgeInsets.only(bottom: 16),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: isDarkMode ? Colors.grey[850] : Colors.white,
                           borderRadius: BorderRadius.circular(14),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
+                              color: isDarkMode
+                                  ? Colors.black.withOpacity(0.2)
+                                  : Colors.black.withOpacity(0.04),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -131,7 +145,9 @@ class DiagnosisScreen extends StatelessWidget {
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
-                                    color: Colors.blueGrey[900],
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.blueGrey[900],
                                   ),
                                 ),
                                 const SizedBox(width: 6),
@@ -149,13 +165,17 @@ class DiagnosisScreen extends StatelessWidget {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 10, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: isDarkMode
+                                        ? Colors.grey[800]
+                                        : Colors.white,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
                                     '${diag['percent']}%',
-                                    style: const TextStyle(
-                                      color: Color(0xFF2196F3),
+                                    style: TextStyle(
+                                      color: isDarkMode
+                                          ? Colors.blue[300]
+                                          : const Color(0xFF2196F3),
                                       fontWeight: FontWeight.bold,
                                       fontSize: 15,
                                     ),
@@ -167,7 +187,9 @@ class DiagnosisScreen extends StatelessWidget {
                             Text(
                               diag['desc'],
                               style: TextStyle(
-                                color: Colors.blueGrey[800],
+                                color: isDarkMode
+                                    ? Colors.grey[400]
+                                    : Colors.blueGrey[800],
                                 fontSize: 14,
                               ),
                             ),
@@ -191,21 +213,29 @@ class DiagnosisScreen extends StatelessWidget {
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDarkMode ? Colors.grey[850] : Colors.white,
                       borderRadius: BorderRadius.circular(10),
-                      border:
-                          Border.all(color: const Color(0xFFB0BEC5), width: 1),
+                      border: Border.all(
+                          color: isDarkMode
+                              ? Colors.grey[700]!
+                              : const Color(0xFFB0BEC5),
+                          width: 1),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.info_outline,
-                            color: Color(0xFF2196F3), size: 20),
+                        Icon(Icons.info_outline,
+                            color: isDarkMode
+                                ? Colors.blue[300]
+                                : const Color(0xFF2196F3),
+                            size: 20),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             'This is not a medical diagnosis. Please consult with a healthcare professional.',
                             style: TextStyle(
-                              color: Colors.blueGrey[700],
+                              color: isDarkMode
+                                  ? Colors.grey[400]
+                                  : Colors.blueGrey[700],
                               fontSize: 13,
                             ),
                           ),

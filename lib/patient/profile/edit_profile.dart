@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import '../../services/cloudinary_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> profileData;
@@ -23,6 +26,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String? _selectedGender;
   bool _isLoading = false;
   final Set<String> _selectedConditions = {};
+  File? _profileImage;
+  String? _profileImageUrl;
 
   // Predefined medical conditions
   final List<Map<String, dynamic>> _commonConditions = [
@@ -53,6 +58,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _medicalConditionsController =
         TextEditingController(text: widget.profileData['additionalConditions']);
     _selectedGender = widget.profileData['gender'];
+    _profileImageUrl = widget.profileData['profilePic'] as String?;
 
     // Initialize selected conditions
     if (widget.profileData['medicalConditions'] != null) {
@@ -86,6 +92,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
+    }
+  }
+
   Future<void> _updateProfile() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -94,6 +111,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception('User not logged in');
+
+      String? imageUrl = _profileImageUrl;
+      if (_profileImage != null) {
+        imageUrl = await CloudinaryService.uploadImage(_profileImage!);
+        if (imageUrl == null) throw Exception('Image upload failed');
+      }
 
       await FirebaseFirestore.instance
           .collection('users')
@@ -107,6 +130,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'gender': _selectedGender,
         'medicalConditions': _selectedConditions.toList(),
         'additionalConditions': _medicalConditionsController.text.trim(),
+        'profilePic': imageUrl,
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
@@ -248,6 +272,46 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Center(
+                      child: Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 50,
+                            backgroundImage: _profileImage != null
+                                ? FileImage(_profileImage!)
+                                : (_profileImageUrl != null &&
+                                        _profileImageUrl!.isNotEmpty)
+                                    ? NetworkImage(_profileImageUrl!)
+                                        as ImageProvider
+                                    : const AssetImage(
+                                        'assets/default_avatar.png'),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: InkWell(
+                              onTap: _pickImage,
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 4,
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(Icons.camera_alt,
+                                    color: Color(0xFF0288D1)),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
                     TextFormField(
                       controller: _fullNameController,
                       decoration: InputDecoration(

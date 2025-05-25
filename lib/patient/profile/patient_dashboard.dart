@@ -14,6 +14,8 @@ import 'package:medcon30/patient/modules/SOS/sos_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:medcon30/patient/profile/profile_gate.dart';
+import 'package:medcon30/services/auth_service.dart';
+import 'package:medcon30/splash_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -85,8 +87,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
 
     if (_isLoading) {
       return Scaffold(
@@ -128,37 +130,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           title: Text(_titles[_currentIndex]),
           backgroundColor: isDarkMode ? Colors.grey[850] : Colors.white,
           foregroundColor: const Color(0xFF0288D1),
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () async {
-              final shouldPop = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Exit App'),
-                  content: const Text('Are you sure you want to exit?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: const Text('No'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      child: const Text('Yes'),
-                    ),
-                  ],
-                ),
-              );
-              if (shouldPop ?? false) {
-                if (context.mounted) {
-                  Navigator.of(context).pop();
-                }
-              }
-            },
-          ),
+          elevation: 0.5,
+          centerTitle: true,
+          surfaceTintColor: isDarkMode ? Colors.grey[850] : Colors.white,
+          scrolledUnderElevation: 0,
           actions: [
-            // Theme Toggle Switch
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Row(
@@ -177,7 +153,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
             ),
-            // Notification Button
             IconButton(
               icon: const Icon(Icons.notifications),
               color: const Color(0xFF0288D1),
@@ -189,6 +164,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         isDarkMode ? Colors.grey[800] : Colors.white,
                   ),
                 );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.logout),
+              color: const Color(0xFF0288D1),
+              onPressed: () async {
+                // Show confirmation dialog
+                final shouldLogout = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Logout'),
+                    content: const Text('Are you sure you want to logout?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('Logout'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (shouldLogout == true) {
+                  try {
+                    await AuthService().signOut(context);
+                    if (mounted) {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const SplashScreen()),
+                        (route) => false,
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error logging out: $e')),
+                      );
+                    }
+                  }
+                }
               },
             ),
           ],
@@ -392,7 +409,7 @@ class _DashboardContent extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => const HeartDiseaseDetectionScreen(),
+                    builder: (_) => HeartDiseaseDetectionScreen(),
                   ),
                 );
               },

@@ -1,21 +1,33 @@
 import 'package:flutter/material.dart';
 import '../../profile/patient_dashboard.dart';
 import 'package:medcon30/patient/modules/nutrition/plan.dart';
+import 'package:provider/provider.dart';
+import 'package:medcon30/theme/theme_provider.dart';
 
 class NutritionFitnessScreen extends StatelessWidget {
   const NutritionFitnessScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final bgColor =
+        isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FB);
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor = isDarkMode ? const Color(0xFFB0B0B0) : Colors.black54;
+    final borderColor =
+        isDarkMode ? const Color(0xFF2C2C2C) : const Color(0xFFBDBDBD);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FB),
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: cardColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        surfaceTintColor: Colors.white,
+        surfaceTintColor: cardColor,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF0288D1)),
+          icon: Icon(Icons.arrow_back_ios_new,
+              color: isDarkMode ? Colors.white : const Color(0xFF0288D1)),
           onPressed: () {
             Navigator.pushAndRemoveUntil(
               context,
@@ -24,10 +36,10 @@ class NutritionFitnessScreen extends StatelessWidget {
             );
           },
         ),
-        title: const Text(
+        title: Text(
           'Nutrition & Fitness',
           style: TextStyle(
-            color: Color(0xFF0288D1),
+            color: isDarkMode ? Colors.white : const Color(0xFF0288D1),
             fontWeight: FontWeight.bold,
             fontSize: 19,
           ),
@@ -41,7 +53,7 @@ class NutritionFitnessScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Greeting Row
-              const Row(
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
@@ -50,18 +62,22 @@ class NutritionFitnessScreen extends StatelessWidget {
                       children: [
                         Text('Hi, Sarah!',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 22)),
-                        SizedBox(height: 2),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22,
+                                color: textColor)),
+                        const SizedBox(height: 2),
                         Text("Let's achieve your goals today",
                             style:
-                                TextStyle(color: Colors.black54, fontSize: 15)),
+                                TextStyle(color: subTextColor, fontSize: 15)),
                       ],
                     ),
                   ),
                   CircleAvatar(
                     radius: 22,
-                    backgroundImage: NetworkImage(
+                    backgroundImage: const NetworkImage(
                         'https://randomuser.me/api/portraits/women/44.jpg'),
+                    backgroundColor:
+                        isDarkMode ? const Color(0xFF2C2C2C) : null,
                   ),
                 ],
               ),
@@ -73,14 +89,20 @@ class NutritionFitnessScreen extends StatelessWidget {
               _ScheduleCard(),
               const SizedBox(height: 18),
               // Quick Actions
-              const Text('Quick Actions',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text('Quick Actions',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: textColor)),
               const SizedBox(height: 10),
               _QuickActionsGrid(),
               const SizedBox(height: 18),
               // Recent Activities
-              const Text('Recent Activities',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text('Recent Activities',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: textColor)),
               const SizedBox(height: 10),
               _RecentActivities(),
             ],
@@ -94,12 +116,15 @@ class NutritionFitnessScreen extends StatelessWidget {
 class _ProgressCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF4F8CFF), Color(0xFF7B61FF)],
+        gradient: LinearGradient(
+          colors: isDarkMode
+              ? [const Color(0xFF2B4C8C), const Color(0xFF3D2B8C)]
+              : [const Color(0xFF4F8CFF), const Color(0xFF7B61FF)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -173,15 +198,20 @@ class _ProgressStat extends StatelessWidget {
 class _ScheduleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor = isDarkMode ? const Color(0xFFB0B0B0) : Colors.black54;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.07),
+            color: Colors.grey.withOpacity(isDarkMode ? 0.1 : 0.07),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -189,21 +219,26 @@ class _ScheduleCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.access_time, color: Color(0xFF4F8CFF)),
+          Icon(Icons.access_time,
+              color: isDarkMode
+                  ? const Color(0xFF7B9EFF)
+                  : const Color(0xFF4F8CFF)),
           const SizedBox(width: 10),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Next up in 30 mins',
                     style: TextStyle(color: Colors.green, fontSize: 13)),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text('Morning Workout',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                SizedBox(height: 2),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: textColor)),
+                const SizedBox(height: 2),
                 Text('30 min cardio session',
-                    style: TextStyle(color: Colors.black54, fontSize: 13)),
+                    style: TextStyle(color: subTextColor, fontSize: 13)),
               ],
             ),
           ),
@@ -226,6 +261,11 @@ class _ScheduleCard extends StatelessWidget {
 class _QuickActionsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor = isDarkMode ? const Color(0xFFB0B0B0) : Colors.black54;
+
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
@@ -235,7 +275,7 @@ class _QuickActionsGrid extends StatelessWidget {
       childAspectRatio: 1.3,
       children: [
         _QuickActionCard(
-          color: const Color(0xFFFFE5E5),
+          color: isDarkMode ? const Color(0xFF2C1E1E) : const Color(0xFFFFE5E5),
           icon: Icons.favorite_border,
           title: 'Health Info',
           subtitle: 'Update metrics',
@@ -248,7 +288,7 @@ class _QuickActionsGrid extends StatelessWidget {
           },
         ),
         _QuickActionCard(
-          color: const Color(0xFFE5FFF3),
+          color: isDarkMode ? const Color(0xFF1E2C1E) : const Color(0xFFE5FFF3),
           icon: Icons.restaurant_menu,
           title: 'View Plan',
           subtitle: 'View & track',
@@ -278,6 +318,10 @@ class _QuickActionCard extends StatelessWidget {
       this.onTap});
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor = isDarkMode ? const Color(0xFFB0B0B0) : Colors.black54;
+
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
@@ -291,14 +335,15 @@ class _QuickActionCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.black54, size: 28),
+            Icon(icon, color: subTextColor, size: 28),
             const SizedBox(height: 12),
             Text(title,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: textColor)),
             const SizedBox(height: 4),
-            Text(subtitle,
-                style: const TextStyle(color: Colors.black54, fontSize: 13)),
+            Text(subtitle, style: TextStyle(color: subTextColor, fontSize: 13)),
           ],
         ),
       ),
@@ -311,21 +356,31 @@ class HealthInformationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final bgColor =
+        isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FB);
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor = isDarkMode ? const Color(0xFFB0B0B0) : Colors.black54;
+    final borderColor =
+        isDarkMode ? const Color(0xFF2C2C2C) : const Color(0xFFBDBDBD);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FB),
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: cardColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        surfaceTintColor: Colors.white,
+        surfaceTintColor: cardColor,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF0288D1)),
+          icon: Icon(Icons.arrow_back_ios_new,
+              color: isDarkMode ? Colors.white : const Color(0xFF0288D1)),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Health Information',
           style: TextStyle(
-            color: Color(0xFF0288D1),
+            color: isDarkMode ? Colors.white : const Color(0xFF0288D1),
             fontWeight: FontWeight.bold,
             fontSize: 19,
           ),
@@ -343,34 +398,53 @@ class HealthInformationScreen extends StatelessWidget {
                 Expanded(
                   child: LinearProgressIndicator(
                     value: 0.5,
-                    backgroundColor: Colors.grey[300],
+                    backgroundColor:
+                        isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey[300],
                     color: const Color(0xFF4F8CFF),
                     minHeight: 6,
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Text('1/2',
+                Text('1/2',
                     style: TextStyle(
-                        color: Colors.black54, fontWeight: FontWeight.w500)),
+                        color: subTextColor, fontWeight: FontWeight.w500)),
               ],
             ),
             const SizedBox(height: 18),
-            const Text('Personal Information',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text('Personal Information',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: textColor)),
             const SizedBox(height: 10),
-            const Text('Age',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+            Text('Age',
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: textColor)),
             const SizedBox(height: 6),
             TextField(
               decoration: InputDecoration(
                 hintText: 'Enter your age',
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                hintStyle: TextStyle(color: subTextColor),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: borderColor),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: borderColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Color(0xFF4F8CFF)),
+                ),
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: cardColor,
               ),
+              style: TextStyle(color: textColor),
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 12),
@@ -380,20 +454,35 @@ class HealthInformationScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Weight (kg)',
+                      Text('Weight (kg)',
                           style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w500)),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: textColor)),
                       const SizedBox(height: 6),
                       TextField(
                         decoration: InputDecoration(
                           hintText: 'Weight',
+                          hintStyle: TextStyle(color: subTextColor),
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: borderColor),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: borderColor),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                const BorderSide(color: Color(0xFF4F8CFF)),
+                          ),
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 14, vertical: 12),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: cardColor,
                         ),
+                        style: TextStyle(color: textColor),
                         keyboardType: TextInputType.number,
                       ),
                     ],
@@ -404,20 +493,35 @@ class HealthInformationScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Height (cm)',
+                      Text('Height (cm)',
                           style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w500)),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: textColor)),
                       const SizedBox(height: 6),
                       TextField(
                         decoration: InputDecoration(
                           hintText: 'Height',
+                          hintStyle: TextStyle(color: subTextColor),
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: borderColor),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: borderColor),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide:
+                                const BorderSide(color: Color(0xFF4F8CFF)),
+                          ),
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 14, vertical: 12),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: cardColor,
                         ),
+                        style: TextStyle(color: textColor),
                         keyboardType: TextInputType.number,
                       ),
                     ],
@@ -426,55 +530,80 @@ class HealthInformationScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 18),
-            const Text('Medical History',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text('Medical History',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: textColor)),
             const SizedBox(height: 10),
-            const Text('Medical Conditions',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+            Text('Medical Conditions',
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: textColor)),
             const SizedBox(height: 6),
             TextField(
               maxLines: 3,
               decoration: InputDecoration(
                 hintText: 'List any medical conditions or allergies',
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                hintStyle: TextStyle(color: subTextColor),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: borderColor),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: borderColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Color(0xFF4F8CFF)),
+                ),
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: cardColor,
               ),
+              style: TextStyle(color: textColor),
             ),
             const SizedBox(height: 18),
-            const Text('Dietary Preferences',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text('Dietary Preferences',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: textColor)),
             const SizedBox(height: 10),
             CheckboxListTile(
               value: false,
               onChanged: (_) {},
-              title: const Text('Vegetarian'),
+              title: Text('Vegetarian', style: TextStyle(color: textColor)),
               controlAffinity: ListTileControlAffinity.leading,
               contentPadding: EdgeInsets.zero,
+              activeColor: const Color(0xFF4F8CFF),
             ),
             CheckboxListTile(
               value: false,
               onChanged: (_) {},
-              title: const Text('Vegan'),
+              title: Text('Vegan', style: TextStyle(color: textColor)),
               controlAffinity: ListTileControlAffinity.leading,
               contentPadding: EdgeInsets.zero,
+              activeColor: const Color(0xFF4F8CFF),
             ),
             CheckboxListTile(
               value: false,
               onChanged: (_) {},
-              title: const Text('Gluten-Free'),
+              title: Text('Gluten-Free', style: TextStyle(color: textColor)),
               controlAffinity: ListTileControlAffinity.leading,
               contentPadding: EdgeInsets.zero,
+              activeColor: const Color(0xFF4F8CFF),
             ),
             CheckboxListTile(
               value: false,
               onChanged: (_) {},
-              title: const Text('Dairy-Free'),
+              title: Text('Dairy-Free', style: TextStyle(color: textColor)),
               controlAffinity: ListTileControlAffinity.leading,
               contentPadding: EdgeInsets.zero,
+              activeColor: const Color(0xFF4F8CFF),
             ),
             const SizedBox(height: 18),
             SizedBox(
@@ -508,10 +637,10 @@ class HealthInformationScreen extends StatelessWidget {
             Center(
               child: TextButton(
                 onPressed: () {},
-                child: const Text(
+                child: Text(
                   'Edit Later',
                   style: TextStyle(
-                      color: Colors.black54, fontWeight: FontWeight.w500),
+                      color: subTextColor, fontWeight: FontWeight.w500),
                 ),
               ),
             ),
@@ -545,21 +674,31 @@ class _SetYourGoalsScreenState extends State<SetYourGoalsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final bgColor =
+        isDarkMode ? const Color(0xFF121212) : const Color(0xFFF8F9FB);
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor = isDarkMode ? const Color(0xFFB0B0B0) : Colors.black54;
+    final borderColor =
+        isDarkMode ? const Color(0xFF2C2C2C) : const Color(0xFFBDBDBD);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FB),
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: cardColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        surfaceTintColor: Colors.white,
+        surfaceTintColor: cardColor,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF0288D1)),
+          icon: Icon(Icons.arrow_back_ios_new,
+              color: isDarkMode ? Colors.white : const Color(0xFF0288D1)),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Set Your Goals',
           style: TextStyle(
-            color: Color(0xFF0288D1),
+            color: isDarkMode ? Colors.white : const Color(0xFF0288D1),
             fontWeight: FontWeight.bold,
             fontSize: 19,
           ),
@@ -577,20 +716,24 @@ class _SetYourGoalsScreenState extends State<SetYourGoalsScreen> {
                 Expanded(
                   child: LinearProgressIndicator(
                     value: 1.0,
-                    backgroundColor: Colors.grey[300],
+                    backgroundColor:
+                        isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey[300],
                     color: const Color(0xFF4F8CFF),
                     minHeight: 6,
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Text('2/2',
+                Text('2/2',
                     style: TextStyle(
-                        color: Colors.black54, fontWeight: FontWeight.w500)),
+                        color: subTextColor, fontWeight: FontWeight.w500)),
               ],
             ),
             const SizedBox(height: 18),
-            const Text("What's your primary goal?",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text("What's your primary goal?",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: textColor)),
             const SizedBox(height: 12),
             Row(
               children: List.generate(
@@ -604,23 +747,28 @@ class _SetYourGoalsScreenState extends State<SetYourGoalsScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text('Timeline',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text('Timeline',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: textColor)),
             const SizedBox(height: 10),
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: cardColor,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.grey[200]!),
+                border: Border.all(color: borderColor),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
                 children: [
-                  const Text('Program Duration',
-                      style: TextStyle(fontWeight: FontWeight.w500)),
+                  Text('Program Duration',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500, color: textColor)),
                   const Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.remove_circle_outline),
+                    icon:
+                        Icon(Icons.remove_circle_outline, color: subTextColor),
                     onPressed: () {
                       setState(() {
                         if (programWeeks > 1) programWeeks--;
@@ -631,14 +779,17 @@ class _SetYourGoalsScreenState extends State<SetYourGoalsScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF3F6FD),
+                      color: isDarkMode
+                          ? const Color(0xFF2C2C2C)
+                          : const Color(0xFFF3F6FD),
                       borderRadius: BorderRadius.circular(18),
                     ),
                     child: Text('$programWeeks weeks',
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: textColor)),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.add_circle_outline),
+                    icon: Icon(Icons.add_circle_outline, color: subTextColor),
                     onPressed: () {
                       setState(() {
                         programWeeks++;
@@ -652,56 +803,90 @@ class _SetYourGoalsScreenState extends State<SetYourGoalsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Start Date',
-                    style: TextStyle(color: Colors.black54)),
+                Text('Start Date', style: TextStyle(color: subTextColor)),
                 Text(_formatDate(startDate),
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: textColor)),
               ],
             ),
             const SizedBox(height: 2),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('End Date', style: TextStyle(color: Colors.black54)),
+                Text('End Date', style: TextStyle(color: subTextColor)),
                 Text(_formatDate(endDate),
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: textColor)),
               ],
             ),
             const SizedBox(height: 24),
-            const Text('Target Metrics',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text('Target Metrics',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: textColor)),
             const SizedBox(height: 10),
-            const Text('Target Weight (kg)',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+            Text('Target Weight (kg)',
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: textColor)),
             const SizedBox(height: 6),
             TextField(
               controller: targetWeightController,
               decoration: InputDecoration(
                 hintText: 'Enter target weight',
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                hintStyle: TextStyle(color: subTextColor),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: borderColor),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: borderColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Color(0xFF4F8CFF)),
+                ),
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: cardColor,
               ),
+              style: TextStyle(color: textColor),
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 12),
-            const Text('Daily Calorie Target',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+            Text('Daily Calorie Target',
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: textColor)),
             const SizedBox(height: 6),
             TextField(
               controller: calorieTargetController,
               decoration: InputDecoration(
                 hintText: 'Enter daily calorie target',
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                hintStyle: TextStyle(color: subTextColor),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: borderColor),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: borderColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Color(0xFF4F8CFF)),
+                ),
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: cardColor,
               ),
+              style: TextStyle(color: textColor),
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 24),
@@ -766,51 +951,54 @@ class _GoalOption extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  const _GoalOption(
-      {required this.icon,
-      required this.label,
-      required this.selected,
-      required this.onTap});
+
+  const _GoalOption({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor = isDarkMode ? const Color(0xFFB0B0B0) : Colors.black54;
+    final borderColor =
+        isDarkMode ? const Color(0xFF2C2C2C) : const Color(0xFFBDBDBD);
+
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 4),
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 0),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
           decoration: BoxDecoration(
-            color: selected
-                ? const Color(0xFF2056F7).withOpacity(0.08)
-                : Colors.white,
+            color: selected ? const Color(0xFF4F8CFF) : cardColor,
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(
-                color:
-                    selected ? const Color(0xFF2056F7) : Colors.grey.shade300,
-                width: 2),
-            borderRadius: BorderRadius.circular(14),
+              color: selected ? const Color(0xFF4F8CFF) : borderColor,
+            ),
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: selected
-                      ? const Color(0xFF2056F7)
-                      : const Color(0xFFF3F6FD),
-                  shape: BoxShape.circle,
-                ),
-                padding: const EdgeInsets.all(14),
-                child: Icon(icon,
-                    color: selected ? Colors.white : const Color(0xFF2056F7),
-                    size: 28),
+              Icon(
+                icon,
+                color: selected ? Colors.white : subTextColor,
+                size: 24,
               ),
-              const SizedBox(height: 10),
-              Text(label,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color:
-                          selected ? const Color(0xFF2056F7) : Colors.black87)),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  color: selected ? Colors.white : textColor,
+                  fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 13,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         ),
@@ -822,20 +1010,31 @@ class _GoalOption extends StatelessWidget {
 class _RecentActivities extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor = isDarkMode ? const Color(0xFFB0B0B0) : Colors.black54;
+
+    return Column(
       children: [
         _ActivityTile(
           icon: Icons.directions_run_rounded,
-          color: Color(0xFF4F8CFF),
+          color: const Color(0xFF4F8CFF),
           title: 'Completed Morning Workout',
           subtitle: 'Today, 7:30 AM • 350 kcal burned',
+          cardColor: cardColor,
+          textColor: textColor,
+          subTextColor: subTextColor,
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         _ActivityTile(
           icon: Icons.restaurant,
-          color: Color(0xFF7B61FF),
+          color: const Color(0xFF7B61FF),
           title: 'Logged Breakfast',
           subtitle: 'Today, 8:15 AM • 420 kcal',
+          cardColor: cardColor,
+          textColor: textColor,
+          subTextColor: subTextColor,
         ),
       ],
     );
@@ -847,20 +1046,30 @@ class _ActivityTile extends StatelessWidget {
   final Color color;
   final String title;
   final String subtitle;
-  const _ActivityTile(
-      {required this.icon,
-      required this.color,
-      required this.title,
-      required this.subtitle});
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+
+  const _ActivityTile({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.subtitle,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+  });
+
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.07),
+            color: Colors.grey.withOpacity(isDarkMode ? 0.1 : 0.07),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -871,7 +1080,7 @@ class _ActivityTile extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: color.withOpacity(0.13),
+              color: color.withOpacity(isDarkMode ? 0.2 : 0.13),
               borderRadius: BorderRadius.circular(10),
             ),
             padding: const EdgeInsets.all(8),
@@ -882,11 +1091,13 @@ class _ActivityTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w600, fontSize: 14)),
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: textColor)),
               const SizedBox(height: 2),
               Text(subtitle,
-                  style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                  style: TextStyle(fontSize: 12, color: subTextColor)),
             ],
           ),
         ],

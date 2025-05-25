@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:medcon30/patient/profile/patient_dashboard.dart';
 import 'diagnosis.dart';
+import 'package:provider/provider.dart';
+import 'package:medcon30/theme/theme_provider.dart';
 
 class DiseaseDetectionScreen extends StatefulWidget {
   const DiseaseDetectionScreen({super.key});
@@ -64,13 +66,16 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Scaffold(
-      backgroundColor: const Color(0xFFE0F7FA),
+      backgroundColor: isDarkMode ? Colors.grey[900] : const Color(0xFFE0F7FA),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFE0F7FA),
+        backgroundColor:
+            isDarkMode ? Colors.grey[850] : const Color(0xFFE0F7FA),
         elevation: 1,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: Colors.blueGrey[900]),
+          icon: Icon(Icons.arrow_back_ios_new,
+              color: isDarkMode ? Colors.white : Colors.blueGrey[900]),
           onPressed: () {
             Navigator.pushAndRemoveUntil(
               context,
@@ -82,16 +87,18 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
         title: Text(
           'Disease Detection',
           style: TextStyle(
-            color: Colors.blueGrey[900],
+            color: isDarkMode ? Colors.white : Colors.blueGrey[900],
             fontWeight: FontWeight.bold,
             fontSize: 19,
           ),
         ),
         centerTitle: true,
-        actions: const [
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 18.0),
-            child: Icon(Icons.help_outline, color: Color(0xFF2196F3), size: 20),
+            padding: const EdgeInsets.only(right: 18.0),
+            child: Icon(Icons.help_outline,
+                color: isDarkMode ? Colors.blue[300] : const Color(0xFF2196F3),
+                size: 20),
           ),
         ],
       ),
@@ -105,7 +112,8 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    color: const Color(0xFFE0F7FA),
+                    color:
+                        isDarkMode ? Colors.grey[900] : const Color(0xFFE0F7FA),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 18),
                     child: Column(
@@ -116,14 +124,18 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 22,
-                            color: Colors.blueGrey[900],
+                            color: isDarkMode
+                                ? Colors.white
+                                : Colors.blueGrey[900],
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Enter your symptoms to get potential diagnoses',
                           style: TextStyle(
-                            color: Colors.blueGrey[400],
+                            color: isDarkMode
+                                ? Colors.grey[400]
+                                : Colors.blueGrey[400],
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
                           ),
@@ -131,22 +143,35 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                         const SizedBox(height: 18),
                         TextField(
                           controller: searchController,
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
                           decoration: InputDecoration(
-                            prefixIcon: const Icon(Icons.search,
-                                color: Color(0xFF2196F3)),
+                            prefixIcon: Icon(Icons.search,
+                                color: isDarkMode
+                                    ? Colors.blue[300]
+                                    : const Color(0xFF2196F3)),
                             hintText: 'Type your symptoms...',
-                            hintStyle: TextStyle(color: Colors.blueGrey[300]),
+                            hintStyle: TextStyle(
+                                color: isDarkMode
+                                    ? Colors.grey[500]
+                                    : Colors.blueGrey[300]),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor:
+                                isDarkMode ? Colors.grey[850] : Colors.white,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide:
-                                  const BorderSide(color: Color(0xFFE0E3EA)),
+                              borderSide: BorderSide(
+                                  color: isDarkMode
+                                      ? Colors.grey[700]!
+                                      : const Color(0xFFE0E3EA)),
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide:
-                                  const BorderSide(color: Color(0xFFE0E3EA)),
+                              borderSide: BorderSide(
+                                  color: isDarkMode
+                                      ? Colors.grey[700]!
+                                      : const Color(0xFFE0E3EA)),
                             ),
                             contentPadding: const EdgeInsets.symmetric(
                                 vertical: 0, horizontal: 8),
@@ -168,12 +193,16 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? const Color(0xFF2196F3)
-                                      : const Color(0xFFF4F4F4),
+                                      : isDarkMode
+                                          ? Colors.grey[850]
+                                          : const Color(0xFFF4F4F4),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                     color: isSelected
                                         ? const Color(0xFF2196F3)
-                                        : const Color(0xFFE0E3EA),
+                                        : isDarkMode
+                                            ? Colors.grey[700]!
+                                            : const Color(0xFFE0E3EA),
                                     width: 1.5,
                                   ),
                                 ),
@@ -182,7 +211,9 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                                   style: TextStyle(
                                     color: isSelected
                                         ? Colors.white
-                                        : Colors.blueGrey[900],
+                                        : isDarkMode
+                                            ? Colors.white
+                                            : Colors.blueGrey[900],
                                     fontWeight: FontWeight.w500,
                                     fontSize: 15,
                                   ),
@@ -198,7 +229,9 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
-                              color: Colors.blueGrey[900],
+                              color: isDarkMode
+                                  ? Colors.white
+                                  : Colors.blueGrey[900],
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -207,13 +240,27 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                             runSpacing: 10,
                             children: selectedSymptoms
                                 .map((symptom) => Chip(
-                                      label: Text(symptom),
-                                      deleteIcon: const Icon(Icons.close,
-                                          size: 18, color: Color(0xFF2196F3)),
+                                      label: Text(
+                                        symptom,
+                                        style: TextStyle(
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : const Color(0xFF2196F3),
+                                        ),
+                                      ),
+                                      deleteIcon: Icon(Icons.close,
+                                          size: 18,
+                                          color: isDarkMode
+                                              ? Colors.blue[300]
+                                              : const Color(0xFF2196F3)),
                                       onDeleted: () => _removeSymptom(symptom),
-                                      backgroundColor: const Color(0xFFE3F2FD),
-                                      labelStyle: const TextStyle(
-                                          color: Color(0xFF2196F3),
+                                      backgroundColor: isDarkMode
+                                          ? Colors.grey[850]
+                                          : const Color(0xFFE3F2FD),
+                                      labelStyle: TextStyle(
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : const Color(0xFF2196F3),
                                           fontWeight: FontWeight.w600),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
@@ -239,7 +286,9 @@ class _DiseaseDetectionScreenState extends State<DiseaseDetectionScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: selectedSymptoms.isNotEmpty
                                   ? const Color(0xFF2196F3)
-                                  : const Color(0xFFB0BEC5),
+                                  : isDarkMode
+                                      ? Colors.grey[700]
+                                      : const Color(0xFFB0BEC5),
                               minimumSize: const Size(double.infinity, 48),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),

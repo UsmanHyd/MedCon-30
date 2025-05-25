@@ -4,6 +4,7 @@ import '../../services/auth_service.dart';
 import 'patient_dashboard.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'forgot_password_screen.dart';
+import '../../role_selection_screen.dart';
 
 class PatientLoginScreen extends StatefulWidget {
   const PatientLoginScreen({super.key});
@@ -24,10 +25,6 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
   final TextEditingController _signupPasswordController =
       TextEditingController();
   final TextEditingController _signupPhoneController = TextEditingController();
-
-  // Add state variables for password
-  bool _loginPasswordVisible = false;
-  bool _signupPasswordVisible = false;
 
   @override
   void dispose() {
@@ -165,6 +162,18 @@ class _PatientLoginScreenState extends State<PatientLoginScreen> {
       data: ThemeData.light(),
       child: Scaffold(
         backgroundColor: const Color(0xFFE3F2FD),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Color(0xFF0288D1)),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
+              );
+            },
+          ),
+        ),
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -360,19 +369,20 @@ class _LoginForm extends StatefulWidget {
   final TextEditingController passwordController;
   final VoidCallback onLogin;
   final VoidCallback onForgotPassword;
-  const _LoginForm(
-      {super.key,
-      required this.emailController,
-      required this.passwordController,
-      required this.onLogin,
-      required this.onForgotPassword});
+  const _LoginForm({
+    super.key,
+    required this.emailController,
+    required this.passwordController,
+    required this.onLogin,
+    required this.onForgotPassword,
+  });
 
   @override
   State<_LoginForm> createState() => _LoginFormState();
 }
 
 class _LoginFormState extends State<_LoginForm> {
-  bool _loginPasswordVisible = false;
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -394,7 +404,7 @@ class _LoginFormState extends State<_LoginForm> {
         const SizedBox(height: 18),
         TextField(
           controller: widget.passwordController,
-          obscureText: !_loginPasswordVisible,
+          obscureText: _obscurePassword,
           decoration: InputDecoration(
             prefixIcon: const Icon(Icons.lock, color: Color(0xFF0288D1)),
             labelText: 'Password',
@@ -402,12 +412,13 @@ class _LoginFormState extends State<_LoginForm> {
             filled: true,
             fillColor: Colors.white,
             suffixIcon: IconButton(
-              icon: Icon(_loginPasswordVisible
-                  ? Icons.visibility
-                  : Icons.visibility_off),
+              icon: Icon(
+                _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                color: const Color(0xFF0288D1),
+              ),
               onPressed: () {
                 setState(() {
-                  _loginPasswordVisible = !_loginPasswordVisible;
+                  _obscurePassword = !_obscurePassword;
                 });
               },
             ),
@@ -446,20 +457,21 @@ class _SignupForm extends StatefulWidget {
   final TextEditingController passwordController;
   final TextEditingController phoneController;
   final VoidCallback onSignup;
-  const _SignupForm(
-      {super.key,
-      required this.nameController,
-      required this.emailController,
-      required this.passwordController,
-      required this.phoneController,
-      required this.onSignup});
+  const _SignupForm({
+    super.key,
+    required this.nameController,
+    required this.emailController,
+    required this.passwordController,
+    required this.phoneController,
+    required this.onSignup,
+  });
 
   @override
   State<_SignupForm> createState() => _SignupFormState();
 }
 
 class _SignupFormState extends State<_SignupForm> {
-  bool _signupPasswordVisible = false;
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -504,7 +516,7 @@ class _SignupFormState extends State<_SignupForm> {
         const SizedBox(height: 18),
         TextField(
           controller: widget.passwordController,
-          obscureText: !_signupPasswordVisible,
+          obscureText: _obscurePassword,
           decoration: InputDecoration(
             prefixIcon: const Icon(Icons.lock, color: Color(0xFF0288D1)),
             labelText: 'Password',
@@ -512,12 +524,13 @@ class _SignupFormState extends State<_SignupForm> {
             filled: true,
             fillColor: Colors.white,
             suffixIcon: IconButton(
-              icon: Icon(_signupPasswordVisible
-                  ? Icons.visibility
-                  : Icons.visibility_off),
+              icon: Icon(
+                _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                color: const Color(0xFF0288D1),
+              ),
               onPressed: () {
                 setState(() {
-                  _signupPasswordVisible = !_signupPasswordVisible;
+                  _obscurePassword = !_obscurePassword;
                 });
               },
             ),

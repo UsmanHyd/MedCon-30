@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:medcon30/theme/theme_provider.dart';
 import 'disease_detection.dart';
 
 class RequestConfirmedScreen extends StatelessWidget {
@@ -6,140 +8,111 @@ class RequestConfirmedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Scaffold(
-      backgroundColor: const Color(0xFFE0F7FA),
+      backgroundColor: isDarkMode ? Colors.grey[900] : const Color(0xFFE0F7FA),
       body: SafeArea(
-        child: Column(
-          children: [
-            // Top bar
-            Container(
-              color: const Color(0xFFE0F7FA),
-              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back_ios_new,
-                        size: 20, color: Colors.blueGrey[900]),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        'Request Confirmed',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 19,
-                          color: Colors.blueGrey[900],
-                        ),
-                      ),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  color: isDarkMode ? Colors.grey[850] : Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDarkMode
+                          ? Colors.black.withOpacity(0.2)
+                          : Colors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
                     ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(right: 18.0),
-                    child: Icon(Icons.help_outline,
-                        color: Color(0xFF2196F3), size: 20),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(height: 1, thickness: 1, color: Color(0xFFE0E3EA)),
-            Expanded(
-              child: Center(
-                child: Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE0F7FA),
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        blurRadius: 12,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const CircleAvatar(
-                        backgroundColor: Color(0xFFE3F2FD),
-                        radius: 32,
-                        child: Icon(Icons.check,
-                            color: Color(0xFF2196F3), size: 40),
-                      ),
-                      const SizedBox(height: 18),
-                      Text(
-                        'Request Sent\nSuccessfully!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: Colors.blueGrey[900],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Your consultation request has been sent to\nDr. Sarah Johnson. You will receive a\nconfirmation shortly.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.blueGrey[700],
-                          fontSize: 15,
-                        ),
-                      ),
-                      const SizedBox(height: 22),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 14),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE0F7FA),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Text('Date:',
-                                    style: TextStyle(
-                                        color: Colors.blueGrey[400],
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15)),
-                                const SizedBox(width: 8),
-                                const Text('Friday, May 9, 2025',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15)),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Text('Time:',
-                                    style: TextStyle(
-                                        color: Colors.blueGrey[400],
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15)),
-                                const SizedBox(width: 8),
-                                const Text('04:00 PM',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15)),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.check_circle_outline,
+                  size: 60,
+                  color:
+                      isDarkMode ? Colors.blue[300] : const Color(0xFF2196F3),
                 ),
               ),
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8),
-              child: SizedBox(
+              const SizedBox(height: 32),
+              Text(
+                'Request Confirmed',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.blueGrey[900],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Your disease detection request has been submitted successfully. Our AI system will analyze your symptoms and provide a detailed report.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDarkMode ? Colors.grey[400] : Colors.blueGrey[700],
+                ),
+              ),
+              const SizedBox(height: 32),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isDarkMode ? Colors.grey[850] : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDarkMode
+                          ? Colors.black.withOpacity(0.2)
+                          : Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.access_time,
+                          color: isDarkMode
+                              ? Colors.blue[300]
+                              : const Color(0xFF2196F3),
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Estimated Time',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: isDarkMode
+                                ? Colors.white
+                                : Colors.blueGrey[900],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Your results will be ready in approximately 5-10 minutes.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDarkMode
+                            ? Colors.grey[400]
+                            : Colors.blueGrey[700],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
@@ -152,9 +125,9 @@ class RequestConfirmedScreen extends StatelessWidget {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF2196F3),
-                    minimumSize: const Size(double.infinity, 48),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 0,
                   ),
@@ -168,9 +141,8 @@ class RequestConfirmedScreen extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
-          ],
+            ],
+          ),
         ),
       ),
     );

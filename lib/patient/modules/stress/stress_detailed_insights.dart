@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:provider/provider.dart';
+import 'package:medcon30/theme/theme_provider.dart';
 
 class StressDetailedInsightsScreen extends StatefulWidget {
   const StressDetailedInsightsScreen({Key? key}) : super(key: key);
@@ -55,19 +57,28 @@ class _StressDetailedInsightsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final bgColor = isDarkMode ? const Color(0xFF121212) : Colors.white;
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor =
+        isDarkMode ? const Color(0xFFB0B0B0) : const Color(0xFF757575);
+    final borderColor =
+        isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey.shade200;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('Detailed Insights'),
+        title: Text('Detailed Insights', style: TextStyle(color: textColor)),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: bgColor,
+        foregroundColor: textColor,
         scrolledUnderElevation: 0,
-        surfaceTintColor: Colors.white,
+        surfaceTintColor: bgColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline_rounded),
@@ -75,13 +86,15 @@ class _StressDetailedInsightsScreenState
           ),
         ],
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: bgColor,
       body: Column(
         children: [
           _TabBar(
             tabs: _tabs,
             selectedIndex: _selectedTab,
             onTabSelected: _scrollToSection,
+            isDarkMode: isDarkMode,
+            textColor: textColor,
           ),
           Expanded(
             child: ListView(
@@ -89,45 +102,97 @@ class _StressDetailedInsightsScreenState
               padding: EdgeInsets.zero,
               children: [
                 const SizedBox(height: 8),
-                _WellnessScoreCard(),
+                _WellnessScoreCard(
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  borderColor: borderColor,
+                ),
                 const SizedBox(height: 16),
-                _SectionTitle('Activity Patterns', key: _patternsKey),
-                _ActivityPatternsCard(),
+                _SectionTitle('Activity Patterns',
+                    key: _patternsKey, textColor: textColor),
+                _ActivityPatternsCard(
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  borderColor: borderColor,
+                ),
                 const SizedBox(height: 16),
-                _SectionTitle('Progress Trends', key: _trendsKey),
-                _TrendsChartCard(),
+                _SectionTitle('Progress Trends',
+                    key: _trendsKey, textColor: textColor),
+                _TrendsChartCard(
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  borderColor: borderColor,
+                ),
                 const SizedBox(height: 8),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
                         _TrendChip(
-                            label: 'Most Improved',
-                            value: 'Stress Education',
-                            color: Color(0xFF4ADE80)),
-                        SizedBox(width: 8),
+                          label: 'Most Improved',
+                          value: 'Stress Education',
+                          color: const Color(0xFF4ADE80),
+                          textColor: textColor,
+                          subTextColor: subTextColor,
+                        ),
+                        const SizedBox(width: 8),
                         _TrendChip(
-                            label: 'Needs Attention',
-                            value: 'Sleep Improvement',
-                            color: Color(0xFFFFC107)),
+                          label: 'Needs Attention',
+                          value: 'Sleep Improvement',
+                          color: const Color(0xFFFFC107),
+                          textColor: textColor,
+                          subTextColor: subTextColor,
+                        ),
                       ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                _SectionTitle('Category Breakdown', key: _categoriesKey),
-                _CategoryBreakdownCard(),
+                _SectionTitle('Category Breakdown',
+                    key: _categoriesKey, textColor: textColor),
+                _CategoryBreakdownCard(
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  borderColor: borderColor,
+                ),
                 const SizedBox(height: 16),
-                const _SectionTitle('Performance Comparison'),
-                _PerformanceComparisonCard(),
+                _SectionTitle('Performance Comparison', textColor: textColor),
+                _PerformanceComparisonCard(
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  borderColor: borderColor,
+                ),
                 const SizedBox(height: 16),
-                const _SectionTitle('Personalized Recommendations'),
-                _RecommendationsCard(),
+                _SectionTitle('Personalized Recommendations',
+                    textColor: textColor),
+                _RecommendationsCard(
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  borderColor: borderColor,
+                ),
                 const SizedBox(height: 16),
-                const _SectionTitle('Your Action Plan'),
-                _ActionPlanCard(),
+                _SectionTitle('Your Action Plan', textColor: textColor),
+                _ActionPlanCard(
+                  isDarkMode: isDarkMode,
+                  cardColor: cardColor,
+                  textColor: textColor,
+                  subTextColor: subTextColor,
+                  borderColor: borderColor,
+                ),
                 const SizedBox(height: 16),
               ],
             ),
@@ -142,14 +207,21 @@ class _TabBar extends StatelessWidget {
   final List<String> tabs;
   final int selectedIndex;
   final ValueChanged<int> onTabSelected;
-  const _TabBar(
-      {required this.tabs,
-      required this.selectedIndex,
-      required this.onTabSelected});
+  final bool isDarkMode;
+  final Color textColor;
+
+  const _TabBar({
+    required this.tabs,
+    required this.selectedIndex,
+    required this.onTabSelected,
+    required this.isDarkMode,
+    required this.textColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: isDarkMode ? const Color(0xFF121212) : Colors.white,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -171,13 +243,15 @@ class _TabBar extends StatelessWidget {
                     border: Border.all(
                       color: selected
                           ? const Color(0xFF7B61FF)
-                          : Colors.grey.shade300,
+                          : isDarkMode
+                              ? const Color(0xFF2C2C2C)
+                              : Colors.grey.shade300,
                     ),
                   ),
                   child: Text(
                     tabs[i],
                     style: TextStyle(
-                      color: selected ? Colors.white : Colors.black87,
+                      color: selected ? Colors.white : textColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -192,15 +266,29 @@ class _TabBar extends StatelessWidget {
 }
 
 class _WellnessScoreCard extends StatelessWidget {
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+  final Color borderColor;
+
+  const _WellnessScoreCard({
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+    required this.borderColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: Colors.grey.shade200),
+        side: BorderSide(color: borderColor),
       ),
       elevation: 1,
-      color: Colors.white,
+      color: cardColor,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -209,21 +297,25 @@ class _WellnessScoreCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Text('Overall Wellness Score',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text('Overall Wellness Score',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: textColor)),
                 const Spacer(),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF3F1FF),
+                    color: isDarkMode
+                        ? const Color(0xFF2C2C2C)
+                        : const Color(0xFFF3F1FF),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text('May 2025',
+                  child: Text('May 2025',
                       style: TextStyle(
                           fontSize: 13,
-                          color: Color(0xFF7B61FF),
+                          color: const Color(0xFF7B61FF),
                           fontWeight: FontWeight.w600)),
                 ),
               ],
@@ -237,58 +329,58 @@ class _WellnessScoreCard extends StatelessWidget {
                     radius: 54.0,
                     lineWidth: 8.0,
                     percent: 0.75,
-                    center: const Column(
+                    center: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text('75%',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 28)),
-                        SizedBox(height: 2),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 28,
+                                color: textColor)),
+                        const SizedBox(height: 2),
                         Text('Excellent',
                             style: TextStyle(
                                 fontSize: 14,
-                                color: Color(0xFF7B61FF),
+                                color: const Color(0xFF7B61FF),
                                 fontWeight: FontWeight.w600)),
                       ],
                     ),
                     progressColor: const Color(0xFF7B61FF),
-                    backgroundColor: const Color(0xFF7B61FF).withOpacity(0.13),
-                    circularStrokeCap: CircularStrokeCap.round,
+                    backgroundColor: isDarkMode
+                        ? const Color(0xFF2C2C2C)
+                        : const Color(0xFFF3F1FF),
                   ),
                   const SizedBox(width: 24),
-                  const _StatCard(
-                      title: 'Weekly Avg',
-                      value: '72%',
-                      change: '+3%',
-                      color: Color(0xFF7B61FF),
-                      width: 72),
-                  const _StatCard(
-                      title: 'Monthly Avg',
-                      value: '68%',
-                      change: '+7%',
-                      color: Color(0xFF7B61FF),
-                      width: 72),
-                  const _StatCard(
-                      title: 'YTD Avg',
-                      value: '65%',
-                      change: '+10%',
-                      color: Color(0xFF7B61FF),
-                      width: 72),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _ScoreItem(
+                        label: 'Stress Management',
+                        score: '85%',
+                        color: const Color(0xFF4ADE80),
+                        textColor: textColor,
+                        subTextColor: subTextColor,
+                      ),
+                      const SizedBox(height: 12),
+                      _ScoreItem(
+                        label: 'Sleep Quality',
+                        score: '70%',
+                        color: const Color(0xFF7B9EFF),
+                        textColor: textColor,
+                        subTextColor: subTextColor,
+                      ),
+                      const SizedBox(height: 12),
+                      _ScoreItem(
+                        label: 'Physical Activity',
+                        score: '65%',
+                        color: const Color(0xFFFFC107),
+                        textColor: textColor,
+                        subTextColor: subTextColor,
+                      ),
+                    ],
+                  ),
                 ],
               ),
-            ),
-            const SizedBox(height: 16),
-            const Row(
-              children: [
-                Icon(Icons.emoji_events, color: Color(0xFFFFC107), size: 20),
-                SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    'Your wellness score is higher than 82% of users',
-                    style: TextStyle(fontSize: 13, color: Colors.black87),
-                  ),
-                ),
-              ],
             ),
           ],
         ),
@@ -297,72 +389,92 @@ class _WellnessScoreCard extends StatelessWidget {
   }
 }
 
-class _StatCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final String change;
+class _ScoreItem extends StatelessWidget {
+  final String label;
+  final String score;
   final Color color;
-  final double width;
-  const _StatCard(
-      {required this.title,
-      required this.value,
-      required this.change,
-      required this.color,
-      this.width = 80});
+  final Color textColor;
+  final Color subTextColor;
+
+  const _ScoreItem({
+    required this.label,
+    required this.score,
+    required this.color,
+    required this.textColor,
+    required this.subTextColor,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        children: [
-          Text(title,
-              style: const TextStyle(fontSize: 12, color: Colors.black54)),
-          const SizedBox(height: 2),
-          Text(value,
-              style: TextStyle(
-                  fontWeight: FontWeight.bold, fontSize: 18, color: color)),
-          const SizedBox(height: 2),
-          Text(change,
-              style: TextStyle(
-                  fontSize: 12, color: color, fontWeight: FontWeight.w600)),
-        ],
-      ),
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(3),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(label, style: TextStyle(fontSize: 14, color: subTextColor)),
+        const SizedBox(width: 8),
+        Text(score,
+            style: TextStyle(
+                fontWeight: FontWeight.bold, fontSize: 14, color: textColor)),
+      ],
     );
   }
 }
 
 class _SectionTitle extends StatelessWidget {
   final String title;
-  @override
-  final Key? key;
-  const _SectionTitle(this.title, {this.key}) : super(key: key);
+  final Color textColor;
+
+  const _SectionTitle(this.title, {Key? key, required this.textColor})
+      : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
-      child: Text(title,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+          color: textColor,
+        ),
+      ),
     );
   }
 }
 
 class _ActivityPatternsCard extends StatelessWidget {
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+  final Color borderColor;
+
+  const _ActivityPatternsCard({
+    Key? key,
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+    required this.borderColor,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: Colors.grey.shade200),
+        side: BorderSide(color: borderColor),
       ),
       elevation: 1,
-      color: Colors.white,
+      color: cardColor,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -392,6 +504,11 @@ class _ActivityPatternsCard extends StatelessWidget {
                   value: '8:00 - 11:00 AM',
                   subtitle: 'Most productive in mornings',
                   color: Color(0xFF7B61FF),
+                  isDarkMode: true,
+                  cardColor: Color(0xFF1E1E1E),
+                  textColor: Colors.white,
+                  subTextColor: Colors.white,
+                  borderColor: Color(0xFF2C2C2C),
                 ),
                 SizedBox(width: 12),
                 _InfoCard(
@@ -400,11 +517,22 @@ class _ActivityPatternsCard extends StatelessWidget {
                   value: 'Monday, Wednesday',
                   subtitle: 'Highest completion rate',
                   color: Color(0xFF7B61FF),
+                  isDarkMode: true,
+                  cardColor: Color(0xFF1E1E1E),
+                  textColor: Colors.white,
+                  subTextColor: Colors.white,
+                  borderColor: Color(0xFF2C2C2C),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            const _PatternInsightsCard(),
+            const _PatternInsightsCard(
+              isDarkMode: true,
+              cardColor: Color(0xFF1E1E1E),
+              textColor: Colors.white,
+              subTextColor: Colors.white,
+              borderColor: Color(0xFF2C2C2C),
+            ),
           ],
         ),
       ),
@@ -452,36 +580,47 @@ class _InfoCard extends StatelessWidget {
   final String value;
   final String subtitle;
   final Color color;
-  const _InfoCard(
-      {required this.icon,
-      required this.title,
-      required this.value,
-      required this.subtitle,
-      required this.color});
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+  final Color borderColor;
+
+  const _InfoCard({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.subtitle,
+    required this.color,
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+    required this.borderColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cardColor,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: borderColor),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: color, size: 20),
             const SizedBox(height: 6),
-            Text(title,
-                style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            Text(title, style: TextStyle(fontSize: 12, color: subTextColor)),
             const SizedBox(height: 2),
             Text(value,
                 style: TextStyle(
                     fontWeight: FontWeight.bold, fontSize: 14, color: color)),
             const SizedBox(height: 2),
-            Text(subtitle,
-                style: const TextStyle(fontSize: 11, color: Colors.black54)),
+            Text(subtitle, style: TextStyle(fontSize: 11, color: subTextColor)),
           ],
         ),
       ),
@@ -490,26 +629,39 @@ class _InfoCard extends StatelessWidget {
 }
 
 class _PatternInsightsCard extends StatelessWidget {
-  const _PatternInsightsCard();
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+  final Color borderColor;
+
+  const _PatternInsightsCard({
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+    required this.borderColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: borderColor),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.info_outline, color: Color(0xFF7B61FF), size: 20),
-          SizedBox(width: 10),
+          const Icon(Icons.info_outline, color: Color(0xFF7B61FF), size: 20),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               "You're most consistent with morning activities, especially breathing exercises and stress education. Consider scheduling meditation sessions in the morning to improve completion rates. Your evening routine shows gaps that could be filled with sleep improvement activities.",
-              style: TextStyle(fontSize: 13, color: Color(0xFF7B61FF)),
+              style: TextStyle(fontSize: 13, color: textColor),
             ),
           ),
         ],
@@ -601,15 +753,30 @@ class _HeatmapWidget extends StatelessWidget {
 // -------------------- TRENDS TAB --------------------
 
 class _TrendsChartCard extends StatelessWidget {
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+  final Color borderColor;
+
+  const _TrendsChartCard({
+    Key? key,
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+    required this.borderColor,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: Colors.grey.shade200),
+        side: BorderSide(color: borderColor),
       ),
       elevation: 1,
-      color: Colors.white,
+      color: cardColor,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -728,30 +895,38 @@ class _TrendChip extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-  const _TrendChip(
-      {required this.label, required this.value, required this.color});
+  final Color textColor;
+  final Color subTextColor;
+
+  const _TrendChip({
+    required this.label,
+    required this.value,
+    required this.color,
+    required this.textColor,
+    required this.subTextColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-              label == 'Most Improved'
-                  ? Icons.trending_up
-                  : Icons.warning_amber_rounded,
-              color: color,
-              size: 18),
-          const SizedBox(width: 6),
           Text(label,
-              style: TextStyle(fontWeight: FontWeight.bold, color: color)),
-          const SizedBox(width: 6),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+              style: TextStyle(
+                  fontSize: 12,
+                  color: subTextColor,
+                  fontWeight: FontWeight.w500)),
+          const SizedBox(height: 4),
+          Text(value,
+              style: TextStyle(
+                  fontSize: 14, fontWeight: FontWeight.bold, color: textColor)),
         ],
       ),
     );
@@ -761,6 +936,21 @@ class _TrendChip extends StatelessWidget {
 // -------------------- CATEGORIES TAB --------------------
 
 class _CategoryBreakdownCard extends StatelessWidget {
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+  final Color borderColor;
+
+  const _CategoryBreakdownCard({
+    Key? key,
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+    required this.borderColor,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -776,6 +966,11 @@ class _CategoryBreakdownCard extends StatelessWidget {
           ],
           improve: ['Box breathing technique', 'Evening practice consistency'],
           recent: 'Deep Breathing\n15 min • May 1, 2025',
+          isDarkMode: true,
+          cardColor: Color(0xFF1E1E1E),
+          textColor: Colors.white,
+          subTextColor: Colors.white,
+          borderColor: Color(0xFF2C2C2C),
         ),
         const _CategoryCard(
           icon: Icons.self_improvement_rounded,
@@ -791,6 +986,11 @@ class _CategoryBreakdownCard extends StatelessWidget {
             'Unguided meditation practice'
           ],
           recent: 'Guided Meditation\n20 min • April 30, 2025',
+          isDarkMode: true,
+          cardColor: Color(0xFF1E1E1E),
+          textColor: Colors.white,
+          subTextColor: Colors.white,
+          borderColor: Color(0xFF2C2C2C),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -824,23 +1024,36 @@ class _CategoryCard extends StatelessWidget {
   final List<String> strengths;
   final List<String> improve;
   final String recent;
-  const _CategoryCard(
-      {required this.icon,
-      required this.color,
-      required this.title,
-      required this.percent,
-      required this.strengths,
-      required this.improve,
-      required this.recent});
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+  final Color borderColor;
+
+  const _CategoryCard({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.percent,
+    required this.strengths,
+    required this.improve,
+    required this.recent,
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+    required this.borderColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: Colors.grey.shade200),
+        side: BorderSide(color: borderColor),
       ),
       elevation: 1,
-      color: Colors.white,
+      color: cardColor,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Padding(
         padding: const EdgeInsets.all(18.0),
@@ -855,8 +1068,10 @@ class _CategoryCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(title,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: textColor)),
                 const Spacer(),
                 Text('${(percent * 100).toInt()}%',
                     style: TextStyle(
@@ -881,6 +1096,11 @@ class _CategoryCard extends StatelessWidget {
                     title: 'Strengths',
                     items: strengths,
                     color: color,
+                    isDarkMode: isDarkMode,
+                    cardColor: cardColor,
+                    textColor: textColor,
+                    subTextColor: subTextColor,
+                    borderColor: borderColor,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -889,6 +1109,11 @@ class _CategoryCard extends StatelessWidget {
                     title: 'Areas to Improve',
                     items: improve,
                     color: color.withOpacity(0.7),
+                    isDarkMode: isDarkMode,
+                    cardColor: cardColor,
+                    textColor: textColor,
+                    subTextColor: subTextColor,
+                    borderColor: borderColor,
                   ),
                 ),
               ],
@@ -897,9 +1122,9 @@ class _CategoryCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: cardColor,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: borderColor),
               ),
               child: Row(
                 children: [
@@ -907,7 +1132,7 @@ class _CategoryCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text('Recent Activity\n$recent',
-                        style: const TextStyle(fontSize: 13)),
+                        style: TextStyle(fontSize: 13, color: textColor)),
                   ),
                   const SizedBox(width: 8),
                   const Text('Completed',
@@ -928,16 +1153,31 @@ class _StrengthsAreasCard extends StatelessWidget {
   final String title;
   final List<String> items;
   final Color color;
-  const _StrengthsAreasCard(
-      {required this.title, required this.items, required this.color});
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+  final Color borderColor;
+
+  const _StrengthsAreasCard({
+    required this.title,
+    required this.items,
+    required this.color,
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+    required this.borderColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -951,7 +1191,8 @@ class _StrengthsAreasCard extends StatelessWidget {
                   Icon(Icons.circle, size: 7, color: color),
                   const SizedBox(width: 6),
                   Expanded(
-                      child: Text(e, style: const TextStyle(fontSize: 12))),
+                      child: Text(e,
+                          style: TextStyle(fontSize: 12, color: textColor))),
                 ],
               )),
         ],
@@ -961,15 +1202,30 @@ class _StrengthsAreasCard extends StatelessWidget {
 }
 
 class _PerformanceComparisonCard extends StatelessWidget {
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+  final Color borderColor;
+
+  const _PerformanceComparisonCard({
+    Key? key,
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+    required this.borderColor,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: Colors.grey.shade200),
+        side: BorderSide(color: borderColor),
       ),
       elevation: 1,
-      color: Colors.white,
+      color: cardColor,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -1054,22 +1310,30 @@ class _PerformanceComparisonCard extends StatelessWidget {
                   _TrendChip(
                       label: 'Improved',
                       value: 'Stress Education (+15%)',
-                      color: Color(0xFF4ADE80)),
+                      color: Color(0xFF4ADE80),
+                      textColor: Colors.white,
+                      subTextColor: Colors.white),
                   SizedBox(width: 8),
                   _TrendChip(
                       label: 'Improved',
                       value: 'Breathing Exercises (+5%)',
-                      color: Color(0xFF4ADE80)),
+                      color: Color(0xFF4ADE80),
+                      textColor: Colors.white,
+                      subTextColor: Colors.white),
                   SizedBox(width: 8),
                   _TrendChip(
                       label: 'Decreased',
                       value: 'Physical Activities (-5%)',
-                      color: Color(0xFFFFC107)),
+                      color: Color(0xFFFFC107),
+                      textColor: Colors.white,
+                      subTextColor: Colors.white),
                   SizedBox(width: 8),
                   _TrendChip(
                       label: 'Decreased',
                       value: 'Sleep Improvement (-2%)',
-                      color: Color(0xFFFFC107)),
+                      color: Color(0xFFFFC107),
+                      textColor: Colors.white,
+                      subTextColor: Colors.white),
                 ],
               ),
             ),
@@ -1100,15 +1364,30 @@ class _PerformanceComparisonCard extends StatelessWidget {
 }
 
 class _RecommendationsCard extends StatelessWidget {
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+  final Color borderColor;
+
+  const _RecommendationsCard({
+    Key? key,
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+    required this.borderColor,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: Colors.grey.shade200),
+        side: BorderSide(color: borderColor),
       ),
       elevation: 1,
-      color: Colors.white,
+      color: cardColor,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -1134,6 +1413,11 @@ class _RecommendationsCard extends StatelessWidget {
               description:
                   'Your breathing exercises are consistent, but you haven\'t tried box breathing yet. This technique can help reduce stress and improve focus during busy workdays.',
               buttonText: 'Start Now',
+              isDarkMode: true,
+              cardColor: Color(0xFF1E1E1E),
+              textColor: Colors.white,
+              subTextColor: Colors.white,
+              borderColor: Color(0xFF2C2C2C),
             ),
             const _RecommendationActionCard(
               icon: Icons.nightlight_round,
@@ -1141,6 +1425,11 @@ class _RecommendationsCard extends StatelessWidget {
               description:
                   'Your sleep improvement modules have the lowest completion rate. Try scheduling a 15-minute bedtime routine at 9:30 PM to improve sleep quality.',
               buttonText: 'Schedule',
+              isDarkMode: true,
+              cardColor: Color(0xFF1E1E1E),
+              textColor: Colors.white,
+              subTextColor: Colors.white,
+              borderColor: Color(0xFF2C2C2C),
             ),
             const _RecommendationActionCard(
               icon: Icons.self_improvement_rounded,
@@ -1148,6 +1437,11 @@ class _RecommendationsCard extends StatelessWidget {
               description:
                   'You\'re most active in the mornings, but haven\'t tried morning meditation. Adding a 10-minute session at 8:00 AM could enhance your productivity throughout the day.',
               buttonText: 'Try It',
+              isDarkMode: true,
+              cardColor: Color(0xFF1E1E1E),
+              textColor: Colors.white,
+              subTextColor: Colors.white,
+              borderColor: Color(0xFF2C2C2C),
             ),
             const SizedBox(height: 8),
             Center(
@@ -1170,20 +1464,33 @@ class _RecommendationActionCard extends StatelessWidget {
   final String title;
   final String description;
   final String buttonText;
-  const _RecommendationActionCard(
-      {required this.icon,
-      required this.title,
-      required this.description,
-      required this.buttonText});
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+  final Color borderColor;
+
+  const _RecommendationActionCard({
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.buttonText,
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+    required this.borderColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: borderColor),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1200,7 +1507,8 @@ class _RecommendationActionCard extends StatelessWidget {
                         fontSize: 14,
                         color: Color(0xFF7B61FF))),
                 const SizedBox(height: 4),
-                Text(description, style: const TextStyle(fontSize: 13)),
+                Text(description,
+                    style: TextStyle(fontSize: 13, color: textColor)),
                 const SizedBox(height: 8),
                 OutlinedButton(
                   onPressed: () {},
@@ -1209,7 +1517,7 @@ class _RecommendationActionCard extends StatelessWidget {
                     side: const BorderSide(color: Color(0xFF7B61FF)),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8)),
-                    backgroundColor: Colors.white,
+                    backgroundColor: cardColor,
                   ),
                   child: Text(buttonText,
                       style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -1224,15 +1532,30 @@ class _RecommendationActionCard extends StatelessWidget {
 }
 
 class _ActionPlanCard extends StatelessWidget {
+  final bool isDarkMode;
+  final Color cardColor;
+  final Color textColor;
+  final Color subTextColor;
+  final Color borderColor;
+
+  const _ActionPlanCard({
+    Key? key,
+    required this.isDarkMode,
+    required this.cardColor,
+    required this.textColor,
+    required this.subTextColor,
+    required this.borderColor,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: Colors.grey.shade200),
+        side: BorderSide(color: borderColor),
       ),
       elevation: 1,
-      color: Colors.white,
+      color: cardColor,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -1263,13 +1586,22 @@ class _ActionPlanCard extends StatelessWidget {
             const SizedBox(height: 16),
             const _TaskTile(
                 title: 'Complete Sleep Improvement module',
-                subtitle: '15 min • Highest priority'),
+                subtitle: '15 min • Highest priority',
+                isDarkMode: true,
+                textColor: Colors.white,
+                subTextColor: Colors.white),
             const _TaskTile(
                 title: 'Try morning meditation session',
-                subtitle: '10 min • Medium priority'),
+                subtitle: '10 min • Medium priority',
+                isDarkMode: true,
+                textColor: Colors.white,
+                subTextColor: Colors.white),
             const _TaskTile(
                 title: 'Practice box breathing technique',
-                subtitle: '5 min • Medium priority'),
+                subtitle: '5 min • Medium priority',
+                isDarkMode: true,
+                textColor: Colors.white,
+                subTextColor: Colors.white),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(14),
@@ -1302,25 +1634,45 @@ class _ActionPlanCard extends StatelessWidget {
 class _TaskTile extends StatelessWidget {
   final String title;
   final String subtitle;
-  const _TaskTile({required this.title, required this.subtitle});
+  final bool isDarkMode;
+  final Color textColor;
+  final Color subTextColor;
+
+  const _TaskTile({
+    required this.title,
+    required this.subtitle,
+    required this.isDarkMode,
+    required this.textColor,
+    required this.subTextColor,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Checkbox(value: false, onChanged: (_) {}),
+        Checkbox(
+          value: false,
+          onChanged: (_) {
+            // Handle checkbox change
+          },
+          activeColor: const Color(0xFF7B61FF),
+          checkColor: Colors.white,
+        ),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 14)),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: textColor)),
               Text(subtitle,
-                  style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                  style: TextStyle(fontSize: 12, color: subTextColor)),
             ],
           ),
         ),
-        const Icon(Icons.chevron_right, color: Colors.black26),
+        Icon(Icons.chevron_right, color: subTextColor),
       ],
     );
   }

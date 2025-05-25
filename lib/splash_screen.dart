@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:medcon30/services/auth_service.dart';
+import 'package:medcon30/patient/profile/patient_dashboard.dart';
+import 'package:medcon30/doctor/modules/doctor_dashboard.dart';
+import 'onboarding_screen.dart';
 import 'role_selection_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -81,7 +85,7 @@ class _SplashScreenState extends State<SplashScreen>
     _progressController.forward();
     _progressController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        _startOnboarding();
+        _checkAuthAndNavigate();
       }
     });
 
@@ -102,6 +106,32 @@ class _SplashScreenState extends State<SplashScreen>
     _progressController.dispose();
     _pageController.dispose();
     super.dispose();
+  }
+
+  Future<void> _checkAuthAndNavigate() async {
+    final authService = AuthService();
+    final authState = await authService.checkAuthState();
+
+    if (authState != null) {
+      // User is authenticated, navigate based on role
+      if (mounted) {
+        if (authState['role'] == 'doctor') {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const DoctorDashboard()),
+          );
+        } else if (authState['role'] == 'patient') {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const DashboardScreen()),
+          );
+        } else {
+          // Unknown role, show onboarding
+          _startOnboarding();
+        }
+      }
+    } else {
+      // User is not authenticated, show onboarding
+      _startOnboarding();
+    }
   }
 
   void _startOnboarding() async {

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:medcon30/theme/theme_provider.dart';
 
 class SosMessagingScreen extends StatefulWidget {
   const SosMessagingScreen({Key? key}) : super(key: key);
@@ -209,21 +211,30 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final bgColor =
+        isDarkMode ? const Color(0xFF121212) : const Color(0xFFF5F8FF);
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final subTextColor = isDarkMode ? const Color(0xFFB0B0B0) : Colors.black54;
+    final borderColor = isDarkMode ? const Color(0xFF2C2C2C) : Colors.black12;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F8FF),
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: cardColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        surfaceTintColor: Colors.white,
+        surfaceTintColor: cardColor,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF0288D1)),
+          icon: Icon(Icons.arrow_back,
+              color: isDarkMode ? Colors.white : const Color(0xFF0288D1)),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
+        title: Text(
           'Emergency SOS Help',
           style: TextStyle(
-            color: Color(0xFF0288D1),
+            color: isDarkMode ? Colors.white : const Color(0xFF0288D1),
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
@@ -231,7 +242,8 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.info_outline, color: Color(0xFF0288D1)),
+            icon: Icon(Icons.info_outline,
+                color: isDarkMode ? Colors.white : const Color(0xFF0288D1)),
             onPressed: () {},
           ),
         ],
@@ -265,17 +277,18 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
+                  Text(
                     'Press for Emergency',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
+                      color: textColor,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Activates emergency protocol and alerts your contacts',
-                    style: TextStyle(color: Colors.black54, fontSize: 14),
+                    style: TextStyle(color: subTextColor, fontSize: 14),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -290,7 +303,7 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  color: Colors.grey[800],
+                  color: textColor,
                 ),
               ),
             ),
@@ -298,62 +311,81 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
             // How SOS Works Expansion
             Card(
               margin: const EdgeInsets.only(bottom: 10),
-              color: Colors.white,
+              color: cardColor,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
               child: ExpansionTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.blue.withOpacity(0.15),
-                  child: const Icon(Icons.info, color: Colors.blue),
+                  backgroundColor:
+                      Colors.blue.withOpacity(isDarkMode ? 0.3 : 0.15),
+                  child: Icon(Icons.info,
+                      color: isDarkMode ? Colors.white : Colors.blue),
                 ),
-                title: const Text('How SOS Works',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle:
-                    const Text('Learn about the emergency response system'),
+                title: Text('How SOS Works',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: textColor)),
+                subtitle: Text('Learn about the emergency response system',
+                    style: TextStyle(color: subTextColor)),
                 children: [
                   ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: Colors.blue.withOpacity(0.1),
-                      child: const Text('1',
+                      backgroundColor:
+                          Colors.blue.withOpacity(isDarkMode ? 0.3 : 0.1),
+                      child: Text('1',
                           style: TextStyle(
-                              color: Colors.blue, fontWeight: FontWeight.bold)),
+                              color: isDarkMode ? Colors.white : Colors.blue,
+                              fontWeight: FontWeight.bold)),
                     ),
-                    title: const Text('Press the SOS Button'),
-                    subtitle: const Text(
-                        'In an emergency, press and hold the red SOS button for 3 seconds'),
+                    title: Text('Press the SOS Button',
+                        style: TextStyle(color: textColor)),
+                    subtitle: Text(
+                        'In an emergency, press and hold the red SOS button for 3 seconds',
+                        style: TextStyle(color: subTextColor)),
                   ),
                   ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: Colors.blue.withOpacity(0.1),
-                      child: const Text('2',
+                      backgroundColor:
+                          Colors.blue.withOpacity(isDarkMode ? 0.3 : 0.1),
+                      child: Text('2',
                           style: TextStyle(
-                              color: Colors.blue, fontWeight: FontWeight.bold)),
+                              color: isDarkMode ? Colors.white : Colors.blue,
+                              fontWeight: FontWeight.bold)),
                     ),
-                    title: const Text('Confirmation'),
-                    subtitle: const Text(
-                        'Confirm the emergency alert or cancel if pressed by mistake'),
+                    title: Text('Confirmation',
+                        style: TextStyle(color: textColor)),
+                    subtitle: Text(
+                        'Confirm the emergency alert or cancel if pressed by mistake',
+                        style: TextStyle(color: subTextColor)),
                   ),
                   ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: Colors.blue.withOpacity(0.1),
-                      child: const Text('3',
+                      backgroundColor:
+                          Colors.blue.withOpacity(isDarkMode ? 0.3 : 0.1),
+                      child: Text('3',
                           style: TextStyle(
-                              color: Colors.blue, fontWeight: FontWeight.bold)),
+                              color: isDarkMode ? Colors.white : Colors.blue,
+                              fontWeight: FontWeight.bold)),
                     ),
-                    title: const Text('Alert Sent'),
-                    subtitle: const Text(
-                        'Your emergency contacts will receive your location and alert message'),
+                    title:
+                        Text('Alert Sent', style: TextStyle(color: textColor)),
+                    subtitle: Text(
+                        'Your emergency contacts will receive your location and alert message',
+                        style: TextStyle(color: subTextColor)),
                   ),
                   ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: Colors.blue.withOpacity(0.1),
-                      child: const Text('4',
+                      backgroundColor:
+                          Colors.blue.withOpacity(isDarkMode ? 0.3 : 0.1),
+                      child: Text('4',
                           style: TextStyle(
-                              color: Colors.blue, fontWeight: FontWeight.bold)),
+                              color: isDarkMode ? Colors.white : Colors.blue,
+                              fontWeight: FontWeight.bold)),
                     ),
-                    title: const Text('Emergency Services'),
-                    subtitle: const Text(
-                        'Option to directly call emergency services will appear'),
+                    title: Text('Emergency Services',
+                        style: TextStyle(color: textColor)),
+                    subtitle: Text(
+                        'Option to directly call emergency services will appear',
+                        style: TextStyle(color: subTextColor)),
                   ),
                 ],
               ),
@@ -361,17 +393,21 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
             // Emergency Contacts Expansion
             Card(
               margin: const EdgeInsets.only(bottom: 10),
-              color: Colors.white,
+              color: cardColor,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
               child: ExpansionTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.green.withOpacity(0.15),
-                  child: const Icon(Icons.contacts, color: Colors.green),
+                  backgroundColor:
+                      Colors.green.withOpacity(isDarkMode ? 0.3 : 0.15),
+                  child: Icon(Icons.contacts,
+                      color: isDarkMode ? Colors.white : Colors.green),
                 ),
-                title: const Text('Emergency Contacts',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: const Text('Manage your emergency contact list'),
+                title: Text('Emergency Contacts',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: textColor)),
+                subtitle: Text('Manage your emergency contact list',
+                    style: TextStyle(color: subTextColor)),
                 children: [
                   if (_loadingContacts)
                     const Padding(
@@ -389,9 +425,9 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
-                          const Text(
+                          Text(
                             'No emergency contacts found.',
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(fontSize: 16, color: textColor),
                           ),
                           const SizedBox(height: 16),
                           ElevatedButton.icon(
@@ -415,11 +451,12 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                       Card(
                         margin: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 6),
-                        color: Colors.white,
+                        color: cardColor,
                         child: ListTile(
                           title: Text(contact['name'] ?? '-',
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold)),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor)),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -427,13 +464,17 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                                   .toString()
                                   .isNotEmpty)
                                 Text(contact['relation'] ?? '',
-                                    style: const TextStyle(fontSize: 13)),
+                                    style: TextStyle(
+                                        fontSize: 13, color: subTextColor)),
                               if ((contact['phone'] ?? '')
                                   .toString()
                                   .isNotEmpty)
                                 Text(contact['phone'] ?? '',
-                                    style: const TextStyle(
-                                        fontSize: 13, color: Colors.blue)),
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        color: isDarkMode
+                                            ? Colors.blue[300]
+                                            : Colors.blue)),
                             ],
                           ),
                           trailing: IconButton(
@@ -471,17 +512,21 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
             // Quick Services Expansion
             Card(
               margin: const EdgeInsets.only(bottom: 10),
-              color: Colors.white,
+              color: cardColor,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
               child: ExpansionTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.orange.withOpacity(0.15),
-                  child: const Icon(Icons.phone_in_talk, color: Colors.orange),
+                  backgroundColor:
+                      Colors.orange.withOpacity(isDarkMode ? 0.3 : 0.15),
+                  child: Icon(Icons.phone_in_talk,
+                      color: isDarkMode ? Colors.white : Colors.orange),
                 ),
-                title: const Text('Quick Services',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: const Text('Direct access to emergency numbers'),
+                title: Text('Quick Services',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: textColor)),
+                subtitle: Text('Direct access to emergency numbers',
+                    style: TextStyle(color: subTextColor)),
                 children: [
                   Padding(
                     padding:
@@ -496,6 +541,7 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                                 color: Colors.red,
                                 label: 'Emergency',
                                 number: '911',
+                                isDarkMode: isDarkMode,
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -505,6 +551,7 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                                 color: Colors.blue,
                                 label: 'Police',
                                 number: '999',
+                                isDarkMode: isDarkMode,
                               ),
                             ),
                           ],
@@ -518,6 +565,7 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                                 color: Colors.green,
                                 label: 'Ambulance',
                                 number: '998',
+                                isDarkMode: isDarkMode,
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -527,6 +575,7 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                                 color: Colors.orange,
                                 label: 'Fire Dept',
                                 number: '997',
+                                isDarkMode: isDarkMode,
                               ),
                             ),
                           ],
@@ -537,39 +586,31 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 18),
-            // Setup Instructions
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Setup Instructions',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Colors.grey[800],
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            // Location Sharing Expansion
+            // Location Settings Expansion
             Card(
               margin: const EdgeInsets.only(bottom: 10),
-              color: Colors.white,
+              color: cardColor,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
               child: ExpansionTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.purple.withOpacity(0.15),
-                  child: const Icon(Icons.location_on, color: Colors.purple),
+                  backgroundColor:
+                      Colors.purple.withOpacity(isDarkMode ? 0.3 : 0.15),
+                  child: Icon(Icons.location_on,
+                      color: isDarkMode ? Colors.white : Colors.purple),
                 ),
-                title: const Text('Location Sharing',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: const Text('Configure location sharing settings'),
+                title: Text('Location Settings',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: textColor)),
+                subtitle: Text('Configure location sharing preferences',
+                    style: TextStyle(color: subTextColor)),
                 children: [
                   SwitchListTile(
-                    title: const Text('Share Location During Emergency'),
-                    subtitle: const Text(
-                        'Send your precise location to emergency contacts'),
+                    title: Text('Share Location During Emergency',
+                        style: TextStyle(color: textColor)),
+                    subtitle: Text(
+                        'Send your precise location to emergency contacts',
+                        style: TextStyle(color: subTextColor)),
                     value: _shareLocation,
                     activeColor: const Color(0xFF0288D1),
                     onChanged: (val) {
@@ -579,9 +620,11 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                     },
                   ),
                   SwitchListTile(
-                    title: const Text('Location History'),
-                    subtitle: const Text(
-                        'Share recent location history (last 30 minutes)'),
+                    title: Text('Location History',
+                        style: TextStyle(color: textColor)),
+                    subtitle: Text(
+                        'Share recent location history (last 30 minutes)',
+                        style: TextStyle(color: subTextColor)),
                     value: _locationHistory,
                     activeColor: const Color(0xFF0288D1),
                     onChanged: (val) {
@@ -591,9 +634,10 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                     },
                   ),
                   SwitchListTile(
-                    title: const Text('Continuous Updates'),
-                    subtitle:
-                        const Text('Send location updates every 2 minutes'),
+                    title: Text('Continuous Updates',
+                        style: TextStyle(color: textColor)),
+                    subtitle: Text('Send location updates every 2 minutes',
+                        style: TextStyle(color: subTextColor)),
                     value: _continuousUpdates,
                     activeColor: const Color(0xFF0288D1),
                     onChanged: (val) {
@@ -608,17 +652,21 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
             // Emergency Message Expansion
             Card(
               margin: const EdgeInsets.only(bottom: 10),
-              color: Colors.white,
+              color: cardColor,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
               child: ExpansionTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.cyan.withOpacity(0.15),
-                  child: const Icon(Icons.message, color: Colors.cyan),
+                  backgroundColor:
+                      Colors.cyan.withOpacity(isDarkMode ? 0.3 : 0.15),
+                  child: Icon(Icons.message,
+                      color: isDarkMode ? Colors.white : Colors.cyan),
                 ),
-                title: const Text('Emergency Message',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: const Text('Customize your emergency alert message'),
+                title: Text('Emergency Message',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: textColor)),
+                subtitle: Text('Customize your emergency alert message',
+                    style: TextStyle(color: subTextColor)),
                 children: [
                   Container(
                     width: double.infinity,
@@ -626,19 +674,21 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: cardColor,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.black12, width: 1),
+                      border: Border.all(color: borderColor, width: 1),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Current Message:',
+                        Text('Current Message:',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 14)),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: textColor)),
                         const SizedBox(height: 6),
                         Text(_emergencyMessage,
-                            style: const TextStyle(fontSize: 15)),
+                            style: TextStyle(fontSize: 15, color: textColor)),
                       ],
                     ),
                   ),
@@ -663,19 +713,32 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                               final controller = TextEditingController(
                                   text: _emergencyMessage);
                               return AlertDialog(
-                                title: const Text('Edit Emergency Message'),
+                                backgroundColor: cardColor,
+                                title: Text('Edit Emergency Message',
+                                    style: TextStyle(color: textColor)),
                                 content: TextField(
                                   controller: controller,
                                   maxLines: 4,
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
+                                  style: TextStyle(color: textColor),
+                                  decoration: InputDecoration(
+                                    border: const OutlineInputBorder(),
                                     labelText: 'Emergency Message',
+                                    labelStyle: TextStyle(color: subTextColor),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: borderColor),
+                                    ),
+                                    focusedBorder: const OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Color(0xFF03B6E8)),
+                                    ),
                                   ),
                                 ),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(context),
-                                    child: const Text('Cancel'),
+                                    child: Text('Cancel',
+                                        style: TextStyle(color: textColor)),
                                   ),
                                   ElevatedButton(
                                     onPressed: () =>
@@ -715,7 +778,7 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  color: Colors.grey[800],
+                  color: textColor,
                 ),
               ),
             ),
@@ -726,6 +789,9 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
               title: 'When to Use SOS',
               description:
                   'Only use the SOS feature in genuine emergencies when you need immediate assistance',
+              isDarkMode: isDarkMode,
+              textColor: textColor,
+              subTextColor: subTextColor,
             ),
             _tipCard(
               icon: Icons.check_circle_outline,
@@ -733,6 +799,9 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
               title: 'Stay Calm',
               description:
                   'Try to remain calm and provide clear information about your situation when possible',
+              isDarkMode: isDarkMode,
+              textColor: textColor,
+              subTextColor: subTextColor,
             ),
             _tipCard(
               icon: Icons.cancel,
@@ -740,6 +809,9 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
               title: 'Avoid False Alarms',
               description:
                   'False alarms can divert resources from real emergencies and cause unnecessary concern',
+              isDarkMode: isDarkMode,
+              textColor: textColor,
+              subTextColor: subTextColor,
             ),
             const SizedBox(height: 18),
             // Additional Resources
@@ -750,7 +822,7 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  color: Colors.grey[800],
+                  color: textColor,
                 ),
               ),
             ),
@@ -813,15 +885,19 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
     required Color iconColor,
     required String title,
     required String description,
+    required bool isDarkMode,
+    required Color textColor,
+    required Color subTextColor,
   }) {
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
-      color: Colors.white,
+      color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         leading: Icon(icon, color: iconColor, size: 32),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(description),
+        title: Text(title,
+            style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+        subtitle: Text(description, style: TextStyle(color: subTextColor)),
       ),
     );
   }
@@ -853,15 +929,18 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
     required Color color,
     required String label,
     required String number,
+    required bool isDarkMode,
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.black12, width: 1.2),
+        border: Border.all(
+            color: isDarkMode ? const Color(0xFF2C2C2C) : Colors.black12,
+            width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
+            color: Colors.grey.withOpacity(isDarkMode ? 0.1 : 0.08),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -874,12 +953,15 @@ class _SosMessagingScreenState extends State<SosMessagingScreen> {
         children: [
           CircleAvatar(
             radius: 24,
-            backgroundColor: color.withOpacity(0.13),
+            backgroundColor: color.withOpacity(isDarkMode ? 0.3 : 0.13),
             child: Icon(icon, color: color, size: 28),
           ),
           const SizedBox(height: 10),
           Text(label,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: isDarkMode ? Colors.white : Colors.black),
               textAlign: TextAlign.center),
           const SizedBox(height: 4),
           Text(number,

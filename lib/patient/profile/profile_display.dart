@@ -9,6 +9,7 @@ import 'patient_login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'patient_dashboard.dart';
+import '../../services/cloudinary_service.dart';
 
 class ProfileDisplayScreen extends StatefulWidget {
   const ProfileDisplayScreen({Key? key}) : super(key: key);
@@ -22,6 +23,10 @@ class _ProfileDisplayScreenState extends State<ProfileDisplayScreen> {
   Map<String, dynamic>? _profileData;
   File? _profileImage;
   final ImagePicker _picker = ImagePicker();
+  bool _showFullscreenCover = false;
+  double _dragStartY = 0.0;
+  double _fullscreenDragStartY = 0.0;
+  double _fullscreenDragDelta = 0.0;
 
   @override
   void initState() {
@@ -70,18 +75,54 @@ class _ProfileDisplayScreenState extends State<ProfileDisplayScreen> {
     }
   }
 
-  Future<void> _pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _profileImage = File(image.path);
-      });
+  Future<void> _pickAndConfirmImage() async {
+    final picker = ImagePicker();
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (pickedFile != null) {
+      final tempImage = File(pickedFile.path);
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Confirm Profile Picture'),
+          content:
+              Image.file(tempImage, width: 120, height: 120, fit: BoxFit.cover),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Yes, Save'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed == true) {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          final url = await CloudinaryService.uploadImage(tempImage);
+          if (url != null) {
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(user.uid)
+                .update({'profilePic': url});
+            setState(() {
+              _profileImage = null;
+              if (_profileData != null) {
+                _profileData!['profilePic'] = url;
+              }
+            });
+          }
+        }
+      }
     }
   }
 
   void _showProfilePictureOptions() {
     if (_profileImage == null) {
-      _pickImage();
+      _pickAndConfirmImage();
       return;
     }
     showModalBottomSheet(
@@ -130,216 +171,13 @@ class _ProfileDisplayScreenState extends State<ProfileDisplayScreen> {
                 title: const Text('Add New Picture'),
                 onTap: () {
                   Navigator.pop(context);
-                  _pickImage();
+                  _pickAndConfirmImage();
                 },
               ),
             ],
           ),
         );
       },
-    );
-  }
-
-  Widget _buildProfileImage() {
-    return GestureDetector(
-      onTap: _showProfilePictureOptions,
-      child: Container(
-        width: 120,
-        height: 120,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Theme.of(context).cardColor
-              : const Color(0xFFE3F2FD),
-          border: Border.all(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.grey[850]!
-                : const Color(0xFF0288D1),
-            width: 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: _profileImage != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(60),
-                child: Image.file(
-                  _profileImage!,
-                  width: 120,
-                  height: 120,
-                  fit: BoxFit.cover,
-                ),
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(
-                    Icons.add_a_photo,
-                    size: 40,
-                    color: Color(0xFF0288D1),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Add Photo',
-                    style: TextStyle(
-                      color: Color(0xFF0288D1),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Theme.of(context).cardColor
-                : const Color(0xFFE3F2FD),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icon, color: Theme.of(context).iconTheme.color),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMedicalConditionsDisplay() {
-    final conditions =
-        _profileData?['medicalConditions'] as List<dynamic>? ?? [];
-    final additionalConditions =
-        _profileData?['additionalConditions'] as String? ?? '';
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Theme.of(context).cardColor
-            : const Color(0xFFE3F2FD),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (conditions.isNotEmpty) ...[
-            const Text(
-              'Selected Conditions',
-              style: TextStyle(
-                color: Color(0xFF0288D1),
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: conditions.map((condition) {
-                return Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Theme.of(context).cardColor
-                        : const Color(0xFFE3F2FD),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Theme.of(context).dividerColor,
-                    ),
-                  ),
-                  child: Text(
-                    condition.toString(),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-          if (additionalConditions.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            const Text(
-              'Additional Conditions',
-              style: TextStyle(
-                color: Color(0xFF0288D1),
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Theme.of(context).cardColor
-                    : const Color(0xFFE3F2FD),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Theme.of(context).dividerColor),
-              ),
-              child: Text(
-                additionalConditions,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ),
-          ],
-          if (conditions.isEmpty && additionalConditions.isEmpty)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                  'No medical conditions recorded',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
     );
   }
 
@@ -352,222 +190,469 @@ class _ProfileDisplayScreenState extends State<ProfileDisplayScreen> {
       return const Center(child: Text('No profile data found'));
     }
     final age = _calculateAge(_profileData!['dateOfBirth'] ?? '');
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const DashboardScreen()),
-          (route) => false,
-        );
-        return false;
-      },
-      child: Scaffold(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? Theme.of(context).scaffoldBackgroundColor
-            : const Color(0xFFE3F2FD),
-        body: SingleChildScrollView(
-          padding:
-              const EdgeInsets.only(top: 32, left: 24, right: 24, bottom: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _buildProfileImage(),
-              const SizedBox(height: 24),
-              Text(
-                _profileData!['name'] ?? 'No Name',
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF0288D1),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                _profileData!['email'] ?? 'No Email',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
-              ),
-              const SizedBox(height: 32),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Theme.of(context).cardColor
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
+    final profileImageUrl = _profileImage != null
+        ? _profileImage!.path
+        : (_profileData!['profilePic'] ?? null);
+
+    return Scaffold(
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF121212)
+          : const Color(0xFFE3F2FD),
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: GestureDetector(
+                  onVerticalDragStart: (details) {
+                    _dragStartY = details.localPosition.dy;
+                  },
+                  onVerticalDragUpdate: (details) {
+                    final dragDistance = details.localPosition.dy - _dragStartY;
+                    if (dragDistance > 80 && !_showFullscreenCover) {
+                      setState(() {
+                        _showFullscreenCover = true;
+                      });
+                    }
+                  },
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(32),
+                      bottomRight: Radius.circular(32),
                     ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Personal Information',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0288D1),
-                      ),
+                    child: Container(
+                      height: 260,
+                      width: double.infinity,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF23272F)
+                          : Colors.blue[50],
+                      child: profileImageUrl != null
+                          ? Image(
+                              image: _profileImage != null
+                                  ? FileImage(_profileImage!)
+                                  : NetworkImage(profileImageUrl)
+                                      as ImageProvider,
+                              fit: BoxFit.cover,
+                              alignment: const Alignment(0, -0.3),
+                            )
+                          : Center(
+                              child: Icon(
+                                Icons.account_circle,
+                                size: 120,
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white24
+                                    : Colors.blue[100],
+                              ),
+                            ),
                     ),
-                    const SizedBox(height: 20),
-                    _buildInfoRow(
-                      icon: Icons.phone,
-                      label: 'Phone Number',
-                      value: _profileData!['phoneNumber'] ?? 'Not provided',
-                    ),
-                    const Divider(height: 24),
-                    _buildInfoRow(
-                      icon: Icons.location_on,
-                      label: 'Address',
-                      value: _profileData!['address'] ?? 'Not provided',
-                    ),
-                    const Divider(height: 24),
-                    _buildInfoRow(
-                      icon: Icons.calendar_today,
-                      label: 'Date of Birth',
-                      value: _profileData!['dateOfBirth'] ?? 'Not provided',
-                    ),
-                    if (age != null) ...[
-                      const Divider(height: 24),
-                      _buildInfoRow(
-                        icon: Icons.cake,
-                        label: 'Age',
-                        value: age.toString(),
-                      ),
-                    ],
-                    const Divider(height: 24),
-                    _buildInfoRow(
-                      icon: Icons.person,
-                      label: 'Gender',
-                      value: _profileData!['gender'] ?? 'Not provided',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Theme.of(context).cardColor
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Medical Information',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0288D1),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    _buildMedicalConditionsDisplay(),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditProfileScreen(
-                        profileData: {
-                          'fullName': _profileData!['name'],
-                          'email': _profileData!['email'],
-                          'phoneNumber': _profileData!['phoneNumber'],
-                          'address': _profileData!['address'],
-                          'dateOfBirth': _profileData!['dateOfBirth'],
-                          'gender': _profileData!['gender'],
-                          'medicalConditions':
-                              _profileData!['medicalConditions'].join(', '),
-                          'additionalConditions':
-                              _profileData!['additionalConditions'],
-                        },
-                      ),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Theme.of(context).brightness == Brightness.dark
-                          ? Colors.grey[850]
-                          : const Color(0xFF0288D1),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 2,
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                child: const Text(
-                  'Edit Profile',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              OutlinedButton(
-                onPressed: () async {
-                  try {
-                    await AuthService().signOut(context);
-                    if (mounted) {
-                      Navigator.of(context).pushAndRemoveUntil(
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  const SizedBox(height: 16),
+                  // Main info card
+                  Card(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF23272F)
+                        : Colors.white,
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    elevation: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 18),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: _showProfilePictureOptions,
+                            child: CircleAvatar(
+                              radius: 36,
+                              backgroundColor: Colors.white,
+                              backgroundImage: profileImageUrl != null
+                                  ? (_profileImage != null
+                                          ? FileImage(_profileImage!)
+                                          : NetworkImage(profileImageUrl))
+                                      as ImageProvider
+                                  : null,
+                              child: profileImageUrl == null
+                                  ? const Icon(Icons.account_circle,
+                                      size: 48, color: Color(0xFF0288D1))
+                                  : null,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _profileData!['name'] ?? 'No Name',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.lightBlue[200]
+                                        : const Color(0xFF2196F3),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _profileData!['email'] ?? 'No Email',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white70
+                                        : Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Personal Information Card
+                  Card(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF23272F)
+                        : Colors.white,
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Personal Information',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.lightBlue[200]
+                                      : const Color(0xFF2196F3))),
+                          const SizedBox(height: 10),
+                          _InfoRow(
+                              label: 'Phone Number',
+                              value: _profileData!['phoneNumber'] ??
+                                  'Not provided'),
+                          _InfoRow(
+                              label: 'Address',
+                              value:
+                                  _profileData!['address'] ?? 'Not provided'),
+                          _InfoRow(
+                              label: 'Date of Birth',
+                              value: _profileData!['dateOfBirth'] ??
+                                  'Not provided'),
+                          if (age != null)
+                            _InfoRow(label: 'Age', value: age.toString()),
+                          _InfoRow(
+                              label: 'Gender',
+                              value: _profileData!['gender'] ?? 'Not provided'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Medical Information Card
+                  Card(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF23272F)
+                        : Colors.white,
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Medical Information',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.lightBlue[200]
+                                      : const Color(0xFF2196F3))),
+                          const SizedBox(height: 10),
+                          _MedicalConditionsDisplay(profileData: _profileData),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
                         MaterialPageRoute(
-                            builder: (_) => const PatientLoginScreen()),
-                        (route) => false,
+                          builder: (context) => EditProfileScreen(
+                            profileData: {
+                              'fullName': _profileData!['name'],
+                              'email': _profileData!['email'],
+                              'phoneNumber': _profileData!['phoneNumber'],
+                              'address': _profileData!['address'],
+                              'dateOfBirth': _profileData!['dateOfBirth'],
+                              'gender': _profileData!['gender'],
+                              'medicalConditions':
+                                  _profileData!['medicalConditions']
+                                          ?.join(', ') ??
+                                      '',
+                              'additionalConditions':
+                                  _profileData!['additionalConditions'] ?? '',
+                            },
+                          ),
+                        ),
                       );
-                    }
-                  } catch (e) {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error signing out: $e')),
-                      );
-                    }
-                  }
-                },
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.red,
-                  side: const BorderSide(color: Colors.red),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.grey[850]
+                              : const Color(0xFF0288D1),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
+                      minimumSize: const Size(200, 40),
+                    ),
+                    child: const Text(
+                      'Edit Profile',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                child: const Text(
-                  'Logout',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                  const SizedBox(height: 16),
+                  OutlinedButton(
+                    onPressed: () async {
+                      try {
+                        await AuthService().signOut(context);
+                        if (mounted) {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (_) => const PatientLoginScreen()),
+                            (route) => false,
+                          );
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error signing out: $e')),
+                          );
+                        }
+                      }
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                      side: const BorderSide(color: Colors.red),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      minimumSize: const Size(200, 40),
+                    ),
+                    child: const Text(
+                      'Logout',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 100),
+                ]),
               ),
-              const SizedBox(height: 100),
             ],
           ),
-        ),
+          // Fullscreen cover image overlay
+          if (_showFullscreenCover && profileImageUrl != null)
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: GestureDetector(
+                onVerticalDragStart: (details) {
+                  _fullscreenDragStartY = details.localPosition.dy;
+                  _fullscreenDragDelta = 0.0;
+                },
+                onVerticalDragUpdate: (details) {
+                  _fullscreenDragDelta =
+                      details.localPosition.dy - _fullscreenDragStartY;
+                },
+                onVerticalDragEnd: (_) {
+                  if (_fullscreenDragDelta < -60) {
+                    setState(() {
+                      _showFullscreenCover = false;
+                    });
+                  }
+                },
+                child: Container(
+                  color: Colors.black,
+                  child: Stack(
+                    children: [
+                      InteractiveViewer(
+                        minScale: 0.5,
+                        maxScale: 4,
+                        child: Center(
+                          child: Image(
+                            image: _profileImage != null
+                                ? FileImage(_profileImage!)
+                                : NetworkImage(profileImageUrl)
+                                    as ImageProvider,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 24,
+                        right: 24,
+                        child: GestureDetector(
+                          onTap: () =>
+                              setState(() => _showFullscreenCover = false),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              shape: BoxShape.circle,
+                            ),
+                            padding: const EdgeInsets.all(8),
+                            child: const Icon(Icons.close,
+                                color: Colors.white, size: 28),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+  const _InfoRow({required this.label, required this.value});
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final labelColor = isDark ? Colors.lightBlue[100] : Colors.black87;
+    final valueColor = isDark ? Colors.white : Colors.black;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      child: Row(
+        children: [
+          Text('$label:',
+              style: TextStyle(fontWeight: FontWeight.w600, color: labelColor)),
+          const SizedBox(width: 8),
+          Expanded(child: Text(value, style: TextStyle(color: valueColor))),
+        ],
+      ),
+    );
+  }
+}
+
+class _MedicalConditionsDisplay extends StatelessWidget {
+  final Map<String, dynamic>? profileData;
+  const _MedicalConditionsDisplay({required this.profileData});
+  @override
+  Widget build(BuildContext context) {
+    final conditions =
+        profileData?['medicalConditions'] as List<dynamic>? ?? [];
+    final additionalConditions =
+        profileData?['additionalConditions'] as String? ?? '';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (conditions.isNotEmpty) ...[
+          Text(
+            'Selected Conditions',
+            style: TextStyle(
+              color: isDark ? Colors.lightBlue[200] : const Color(0xFF2196F3),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: conditions.map((condition) {
+              return Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF23272F) : Colors.blueGrey[50],
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Theme.of(context).dividerColor,
+                  ),
+                ),
+                child: Text(
+                  condition.toString(),
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+        if (additionalConditions.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          Text(
+            'Additional Conditions',
+            style: TextStyle(
+              color: isDark ? Colors.lightBlue[200] : const Color(0xFF2196F3),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF23272F) : Colors.blueGrey[50],
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Theme.of(context).dividerColor),
+            ),
+            child: Text(
+              additionalConditions,
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+              ),
+            ),
+          ),
+        ],
+        if (conditions.isEmpty && additionalConditions.isEmpty)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                'No medical conditions recorded',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
